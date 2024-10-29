@@ -21,7 +21,7 @@ dT = tsimu(2);
 %A = pinv(X)*Y
 
 %% Test 2
-Diff1_2 = diff(omega_c)/dT;
+Diff1_2 = diff(omega_c(1:end,1))/dT;
 
 Y2 = omega_c(1:end-1, 1);
 X2 = [Vm(1:end-2, 1), Diff1_2];
@@ -53,8 +53,30 @@ L = 0.4254; % m
 r_arm = 0.0254; % m
 
 %% Calculs
+
 J_c = J_eq - ((K_g^2)*n_g*J_m)
 
-R_m = ((-1*A2(2))*K_g*n_g*n_m*k_t)/(A2(1)*J_c)
+R_m = ((-1*A2(2))*K_g*n_g*n_m*k_t)/(A2(1)*J_eq)
 
-B_eq = ((K_g*n_g*n_m*k_t)/(A2(1)*R_m))-((K_g^2)*n_g*J_m)-((n_g*k_m*(K_g^2)*n_m*k_t)/R_m)
+B_eq = ((K_g*n_g*n_m*k_t)/(A2(1)*R_m))-((n_g*k_m*(K_g^2)*n_m*k_t)/R_m)
+
+%% Graphique
+
+sys = tf([A2(1)],[-1*A2(2) 1])
+
+[y,t] = step(sys,tsimu(1:end-1));
+
+plot(tsimu(1:end-1),omega_c(1:end))
+hold on
+plot(t,y)
+
+
+
+
+
+
+
+
+
+
+
