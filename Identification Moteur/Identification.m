@@ -9,24 +9,15 @@ load("data_1v_4-09_100hz.mat");
 % omega_c - vitesse angulaire
 % tsimu - temps de simulation
 
-%% Test 1
+%% Calcul des coefficient Fonction de transfert
 dT = tsimu(2);
 
-%Diff1_1 = diff(servo)/dT;
-%Diff2_1 = diff(Diff1_1)/dT;
+Diff1 = diff(omega_c(1:end,1))/dT;
 
-%Y = servo(1:end-2, 1);
-%X = [Vm(1:end-2, 1), Diff1_1(1:end-1, 1), Diff2_1];
+Y_iden = omega_c(1:end-1, 1);
+X_iden = [Vm(1:end-2, 1), Diff1];
 
-%A = pinv(X)*Y
-
-%% Test 2
-Diff1_2 = diff(omega_c(1:end,1))/dT;
-
-Y2 = omega_c(1:end-1, 1);
-X2 = [Vm(1:end-2, 1), Diff1_2];
-
-A2 = pinv(X2)*Y2
+A_iden = pinv(X_iden)*Y_iden
 
 %% Mise en valeur
 %Charge et engrenage
@@ -43,32 +34,32 @@ J_m = 3.9001*10^(-07);  %kg*m^2
 J_eq = 0.0017728;   %kg*m^2
 
 %Sphère
-m_s = 0.0640;   % kg
 J_s = 4.1290*10^(-06);  % kg*m^2
-r_s = 0.0127;   % m
-g = 9.81;   % m/s^2
-
-%Poutre
-L = 0.4254; % m
-r_arm = 0.0254; % m
 
 %% Calculs
-
 J_c = J_eq - ((K_g^2)*n_g*J_m)
 
-R_m = ((-1*A2(2))*K_g*n_g*n_m*k_t)/(A2(1)*J_eq)
+R_m = ((-1*A_iden(2))*K_g*n_g*n_m*k_t)/(A_iden(1)*J_eq)
 
-B_eq = ((K_g*n_g*n_m*k_t)/(A2(1)*R_m))-((n_g*k_m*(K_g^2)*n_m*k_t)/R_m)
+B_eq = ((K_g*n_g*n_m*k_t)/(A_iden(1)*R_m))-((n_g*k_m*(K_g^2)*n_m*k_t)/R_m)
+
+%% Save les valeurs 
+Path = which("Identification.m");
+Path = strrep(Path, 'Identification.m', 'Valeurs.mat');
+save(Path, "-mat");
 
 %% Graphique
 
-sys = tf([A2(1)],[-1*A2(2) 1])
+sys = tf([A_iden(1)],[-1*A_iden(2) 1]);
 
 [y,t] = step(sys,tsimu(1:end-1));
 
-plot(tsimu(1:end-1),omega_c(1:end))
+% Graphiques
+plot(tsimu(1:end-1)-1,omega_c(1:end), 'red')
 hold on
-plot(t,y)
+plot(t,y, 'black')
+
+
 
 
 
