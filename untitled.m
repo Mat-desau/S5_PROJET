@@ -79,14 +79,42 @@ Kint = 0.423;
 
 theta_Vm = tf(num,den);
 
-FTBF_theta_Vm = feedback(theta_Vm,Kint)
+FTBF_theta_Vm = feedback(theta_Vm,Kint);
 
 rlocus(num,den);
 
 num1 = [5*g*r_arm];
 den1 = [7*L,0,0];
 
-X_theta = tf(num1,den1)
-
+X_theta = tf(num1,den1);
 TFfinal = series(FTBF_theta_Vm, X_theta)
+
+K=20;
+Td =1;
+numpd = K*[Td 0];
+denpd = [1];
+syspd = tf(numpd,denpd);
+TFfinalpd = series(TFfinal, syspd);
+figure
+rlocus(TFfinalpd)
+FTBFfinalpd = feedback(TFfinalpd,1)
+figure
+step(FTBFfinalpd)
+figure
+stepinfo(FTBFfinalpd)
+%% Test résidue
+numfinal = [0.4161];
+denfinal = [6.918e-05 0.01078 0.4207 0 0];
+[r,p,k]=residue(numfinal,denfinal);
+
+poids = abs(r)./abs(real(p));
+
+Tfres = tf([r(3)],[1 -p(3)]) + tf([r(4)],[1 -p(4)])
+
+%[numres, denres] = residue(r(3:4),p(3:4), k)
+
+%Tfres = tf(numres,denres)
+
+systemp = Tfres*syspd
+rlocus(systemp)
 
