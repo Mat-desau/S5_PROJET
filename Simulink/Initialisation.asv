@@ -26,6 +26,10 @@ g = 9.81;   % m/s^2
 L = 0.4254; % m
 r_arm = 0.0254; % m
 
+%Test d'asservissement
+K_int = 0.423;
+Test_Angle = pi/4;
+
 %% Calcul des valeurs manquante
 %Aller chercher les valeurs manquante dans l'autre fichier (R_m, B_eq, J_c, tsimu, Vm)
 %Trouver le path
@@ -70,16 +74,13 @@ D = [0;
 % TF2 = tf(num(2,:), den);
 
 
-%% Sortie du simulink
-Sim_Lin = sim('Modele_Lineaire.slx',"StopTime","10")
+%% Sortie du Simulink Linéraire
+%On a trouver que le meilleur stop time est de 11.258427 pour que ce soit le même nombre de points que la variable servo
+Sim_Lin = sim('Modele_Lineaire.slx',"StopTime","11.258427");
 
-% Graphiques
-%plot(tsimu(1:end-1)-1,omega_c(1:end), 'red')
-figure
-hold on
-%plot(tsimu(1:end-(length(tsimu)-length(Sim_Lin.Omega_C))),Sim_Lin.Omega_C(1:end), 'blue')
-plot(tsimu(1:end),servo(1:end), 'red')
+% Validation que l'angle des servo sont les mêmes que ceux données par le fichier de donnée
+% test1  = ((servo(170)-servo(160))/(tsimu(170)-tsimu(160)))
+% test2  = ((Sim_Lin.Theta_C.Data(170)-Sim_Lin.Theta_C.data(160))/(Sim_Lin.Theta_C.Time(170)-Sim_Lin.Theta_C.Time(160)))
 
-
-test1  = (servo(170)-servo(160))/10
-test2  = (Sim_Lin.Theta_C(170)-Sim_Lim.Theta_C(160))/10
+%% Sortie du Simulink Non-Linéaire
+Sim_Non_Lin = sim('Modele_Non_Lineaire.slx')

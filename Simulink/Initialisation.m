@@ -26,6 +26,10 @@ g = 9.81;   % m/s^2
 L = 0.4254; % m
 r_arm = 0.0254; % m
 
+%Test d'asservissement
+K_int = 0.423;
+Test_Angle = pi/4;
+
 %% Calcul des valeurs manquante
 %Aller chercher les valeurs manquante dans l'autre fichier (R_m, B_eq, J_c, tsimu, Vm)
 %Trouver le path
@@ -66,6 +70,7 @@ D = [0;
 
 %Sortir les fonction de transfert
 [num, den] = ss2tf(A, B, C, D);
+
 % TF1 = tf(num(1,:), den);
 % TF2 = tf(num(2,:), den);
 
@@ -79,4 +84,4 @@ Sim_Lin = sim('Modele_Lineaire.slx',"StopTime","11.258427");
 % test2  = ((Sim_Lin.Theta_C.Data(170)-Sim_Lin.Theta_C.data(160))/(Sim_Lin.Theta_C.Time(170)-Sim_Lin.Theta_C.Time(160)))
 
 %% Sortie du Simulink Non-Linéaire
-Sim_Non_Lin = sim('Modele_Non_Lineaire.slx')
+Sim_Non_Lin = sim('Modele_Non_Lineaire.slx');

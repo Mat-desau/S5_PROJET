@@ -14,10 +14,10 @@ dT = tsimu(2);
 
 Diff1 = diff(omega_c(1:end,1))/dT;
 
-Y = omega_c(1:end-1, 1);
-X = [Vm(1:end-2, 1), Diff1];
+Y_iden = omega_c(1:end-1, 1);
+X_iden = [Vm(1:end-2, 1), Diff1];
 
-A = pinv(X)*Y
+A_iden = pinv(X_iden)*Y_iden
 
 %% Mise en valeur
 %Charge et engrenage
@@ -34,32 +34,42 @@ J_m = 3.9001*10^(-07);  %kg*m^2
 J_eq = 0.0017728;   %kg*m^2
 
 %Sphère
-m_s = 0.0640;   % kg
 J_s = 4.1290*10^(-06);  % kg*m^2
-r_s = 0.0127;   % m
-g = 9.81;   % m/s^2
-
-%Poutre
-L = 0.4254; % m
-r_arm = 0.0254; % m
 
 %% Calculs
-
 J_c = J_eq - ((K_g^2)*n_g*J_m)
 
-R_m = ((-1*A(2))*K_g*n_g*n_m*k_t)/(A2(1)*J_eq)
+R_m = ((-1*A_iden(2))*K_g*n_g*n_m*k_t)/(A_iden(1)*J_eq)
 
-B_eq = ((K_g*n_g*n_m*k_t)/(A2(1)*R_m))-((n_g*k_m*(K_g^2)*n_m*k_t)/R_m)
+B_eq = ((K_g*n_g*n_m*k_t)/(A_iden(1)*R_m))-((n_g*k_m*(K_g^2)*n_m*k_t)/R_m)
+
+%% Save les valeurs 
+Path = which("Identification.m");
+Path = strrep(Path, 'Identification.m', 'Valeurs.mat');
+save(Path, "-mat");
 
 %% Graphique
 
-sys = tf([A2(1)],[-1*A2(2) 1])
+sys = tf([A_iden(1)],[-1*A_iden(2) 1]);
 
 [y,t] = step(sys,tsimu(1:end-1));
 
-plot(tsimu(1:end-1),omega_c(1:end))
-hold on
-plot(t,y)
+% Graphiques
+% plot(tsimu(1:end-1)-1,omega_c(1:end), 'red')
+% hold on
+% plot(t,y, 'black')
+
+%% Test Charlo
+%A_iden(2) = 0.037
+
+A1 = K_g*n_g*n_m*k_t
+
+% R_m = A1*(((A_iden(2)/J_eq)*((1/A_iden(1))-(k_m*K_g)))+k_m*K_g)
+
+R_m2 = (A1*(-1)*A_iden(2))/(J_eq*A_iden(1)) 
+B_eq2 = (A1/R_m)*((1/A_iden(1))-k_m*K_g)
+
+
 
 
 
