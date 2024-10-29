@@ -69,15 +69,23 @@ D = [0;
      0];
 
 %Sortir les fonction de transfert
-[num, den] = ss2tf(A, B, C, D);
+%Fonction de Omega_c/V_m
+num = [K_g*n_m*n_g*k_t]
+den = [R_m*J_eq  (R_m*B_eq+n_g*n_m*k_m*k_t*K_g.^2)]
+%Fonction de V_x/Omega_C
+num1 = [5*g*r_arm];
+den1 = [7*L 0];
 
+TF1 = tf(num, den)
+TF2 = tf(num1, den1)
+%[num, den] = ss2tf(A, B, C, D);
 % TF1 = tf(num(1,:), den);
 % TF2 = tf(num(2,:), den);
 
 
 %% Sortie du Simulink Linéraire
 %On a trouver que le meilleur stop time est de 11.258427 pour que ce soit le même nombre de points que la variable servo
-Sim_Lin = sim('Modele_Lineaire.slx',"StopTime","11.258427");
+Sim_Lin = sim('Modele_Lineaire.slx',"StopTime","10");
 
 % Validation que l'angle des servo sont les mêmes que ceux données par le fichier de donnée
 % test1  = ((servo(170)-servo(160))/(tsimu(170)-tsimu(160)))
@@ -85,3 +93,5 @@ Sim_Lin = sim('Modele_Lineaire.slx',"StopTime","11.258427");
 
 %% Sortie du Simulink Non-Linéaire
 Sim_Non_Lin = sim('Modele_Non_Lineaire.slx');
+
+
