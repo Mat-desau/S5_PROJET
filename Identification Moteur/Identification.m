@@ -55,9 +55,19 @@ sys = tf([A_iden(1)],[-1*A_iden(2) 1]);
 [y,t] = step(sys,tsimu(1:end-1));
 
 % Graphiques
-plot(tsimu(1:end-1)-1,omega_c(1:end), 'red')
-hold on
-plot(t,y, 'black')
+% plot(tsimu(1:end-1)-1,omega_c(1:end), 'red')
+% hold on
+% plot(t,y, 'black')
+
+%% Test Charlo
+% A_iden(2) = 0.037
+% 
+% A1 = K_g*n_g*n_m*k_t
+% 
+% R_m = A1*(((A_iden(2)/J_eq)*((1/A_iden(1))-(k_m*K_g)))+k_m*K_g)
+% 
+% R_m2 = (A1*(-1)*A_iden(2))/(J_eq*A_iden(1)) 
+% B_eq2 = (A1/R_m)*((1/A_iden(1))-k_m*K_g)
 
 
 
