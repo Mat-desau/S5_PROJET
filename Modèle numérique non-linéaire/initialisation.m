@@ -17,7 +17,6 @@ K_g = 70;
     T_c = 1;
 
 %Partie électrique du moteur
-V_m = [t, ones(size(t))];
 k_m = 0.0076776;    % Nm/A
 n_m = 0.69;
 k_t = 0.0076830;    %V/(Rad/s)
@@ -42,7 +41,7 @@ J_eq = 0.0017728;   %kg*m^2
 %Sphère
 m_s = 0.0640;   % kg
 J_s = 4.1290*10^(-06);  % kg*m^2
-r_s = 0.0137;   % m
+r_s = 0.0127;   % m
 g = 9.81;   % m/s^2
 
     %Non-Connu
@@ -61,11 +60,10 @@ r_arm = 0.0254; % m
 
 %% Calcul des valeurs manquante
 % On sait que J_m est à la sortie du moteur et J_c est à la suite des engrenages
-J_c = J_m*K_g;
-
+J_c = J_eq - ((K_g^2)*n_g*J_m);
 B_c = 1;
 R_m = 1;
-B_eq = ;
+B_eq = 0;
 
 %% Matrices
 A = [                   0                          1                0                                              0;
