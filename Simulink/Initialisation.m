@@ -35,6 +35,7 @@ Test_Angle = pi/4;
 %Trouver le path
 Path = which("Initialisation.m");
 Path = strrep(Path, '/Simulink/Initialisation.m', '/Identification Moteur/Valeurs.mat');
+Path = strrep(Path, '\Simulink\Initialisation.m', '\Identification Moteur\Valeurs.mat');
 
 %Ce qu'on veut sortir
 Variables = {"B_eq","J_c", "R_m", "tsimu", "Vm", "servo"};
