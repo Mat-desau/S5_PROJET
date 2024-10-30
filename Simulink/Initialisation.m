@@ -70,14 +70,14 @@ D = [0;
 
 %Sortir les fonction de transfert
 %Fonction de Omega_c/V_m
-num = [K_g*n_m*n_g*k_t]
-den = [R_m*J_eq  (R_m*B_eq+n_g*n_m*k_m*k_t*K_g.^2)]
+num = [K_g*n_m*n_g*k_t];
+den = [R_m*J_eq  (R_m*B_eq+n_g*n_m*k_m*k_t*K_g.^2)];
 %Fonction de V_x/Omega_C
 num1 = [5*g*r_arm];
 den1 = [7*L 0];
 
-TF1 = tf(num, den)
-TF2 = tf(num1, den1)
+TF1 = tf(num, den);
+TF2 = tf(num1, den1);
 %[num, den] = ss2tf(A, B, C, D);
 % TF1 = tf(num(1,:), den);
 % TF2 = tf(num(2,:), den);

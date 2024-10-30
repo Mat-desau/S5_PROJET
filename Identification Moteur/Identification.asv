@@ -9,12 +9,28 @@ load("data_1v_4-09_100hz.mat");
 % omega_c - vitesse angulaire
 % tsimu - temps de simulation
 
+%% Lissage des courbes
+omega_c = deg2rad(omega_c);
+
+P = polyfit(tsimu(1:end-1), omega_c, 15);
+Omega_c = polyval(P, tsimu(1:end-1));
+
+% Plot pour montrer du lissage vs pas lisser
+figure
+hold on
+plot(tsimu(1:end-1), Omega_c, 'red')
+plot(tsimu(1:end-1), omega_c, 'blue')
+title("Méthode de lissage");
+xlabel("Temps (s)");
+ylabel("Vitesse (rad/s)");
+legend(["Lisser", "Non-Lisser"]);
+
 %% Calcul des coefficient Fonction de transfert
 dT = tsimu(2);
 
-Diff1 = diff(omega_c(1:end,1))/dT;
+Diff1 = diff(Omega_c(1:end,1))/dT;
 
-Y_iden = omega_c(1:end-1, 1);
+Y_iden = Omega_c(1:end-1, 1);
 X_iden = [Vm(1:end-2, 1), Diff1];
 
 A_iden = pinv(X_iden)*Y_iden
@@ -39,35 +55,30 @@ J_s = 4.1290*10^(-06);  % kg*m^2
 %% Calculs
 J_c = J_eq - ((K_g^2)*n_g*J_m)
 
-R_m = ((-1*A_iden(2))*K_g*n_g*n_m*k_t)/(A_iden(1)*J_eq)
+R_m = (((-1)*A_iden(2))*K_g*n_g*n_m*k_t)/(A_iden(1)*J_eq)
 
 B_eq = ((K_g*n_g*n_m*k_t)/(A_iden(1)*R_m))-((n_g*k_m*(K_g^2)*n_m*k_t)/R_m)
-
-%% Save les valeurs 
-Path = which("Identification.m");
-Path = strrep(Path, 'Identification.m', 'Valeurs.mat');
-save(Path, "-mat");
 
 %% Graphique
 
 sys = tf([A_iden(1)],[-1*A_iden(2) 1]);
 
-[y,t] = step(sys,tsimu(1:end-1));
+y = lsim(sys,Vm(1:end-1),tsimu(1:end-1));
 
 % Graphiques
-% plot(tsimu(1:end-1)-1,omega_c(1:end), 'red')
-% hold on
-% plot(t,y, 'black')
+figure
+hold on
+plot(tsimu(1:end-1),omega_c(1:end), 'blue')
+plot(tsimu(1:end-1), y, 'red')
+title("Comparaison de la fonction de transfert obtenu avec la méthode des moindres carrées et les vrai données");
+xlabel("Temps (s)");
+ylabel("Vitesse (rad/s)");
+legend(["Vrai données", "Fonction de transfert"]);
 
-%% Test Charlo
-%A_iden(2) = 0.037
-
-A1 = K_g*n_g*n_m*k_t
-
-% R_m = A1*(((A_iden(2)/J_eq)*((1/A_iden(1))-(k_m*K_g)))+k_m*K_g)
-
-R_m2 = (A1*(-1)*A_iden(2))/(J_eq*A_iden(1)) 
-B_eq2 = (A1/R_m)*((1/A_iden(1))-k_m*K_g)
+%% Save les valeurs 
+Path = which("Identification.m");
+Path = strrep(Path, 'Identification.m', 'Valeurs.mat');
+save(Path, "-mat");
 
 
 
