@@ -63,7 +63,6 @@ R_m = (((-1)*A_iden(2))*K_g*n_g*n_m*k_t)/(A_iden(1)*J_eq)
 B_eq = ((K_g*n_g*n_m*k_t)/(A_iden(1)*R_m))-((n_g*k_m*(K_g^2)*n_m*k_t)/R_m)
 
 %% Graphique
-
 sys = tf([A_iden(1)],[-1*A_iden(2) 1]);
 
 y = lsim(sys,Vm(1:end-1),tsimu(1:end-1));
@@ -77,6 +76,13 @@ title("Comparaison de la fonction de transfert obtenu avec la méthode des moind
 xlabel("Temps (s)");
 ylabel("Vitesse (rad/s)");
 legend(["Vrai données", "Fonction de transfert"]);
+
+%% Erreur
+% RMSE
+RMSE = sqrt((1/length(omega_c))*(sum((y-omega_c).^2)))
+% R^2
+Y_ = (1/length(omega_c))*sum(omega_c)
+R_2 = sum((y-Y_).^2)/(sum((omega_c-Y_).^2))
 
 %% Save les valeurs 
 Path = which("Identification.m");

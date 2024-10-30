@@ -28,7 +28,6 @@ L = 0.4254; % m
 r_arm = 0.0254; % m
 
 %Test d'asservissement
-K_int = 0.423;
 Test_Angle = pi/4;
 
 %% Calcul des valeurs manquante
@@ -89,11 +88,12 @@ num_int = [K_g*n_m*n_g*k_t];
 den_int = [R_m*J_eq  (R_m*B_eq+n_g*n_m*k_m*k_t*K_g.^2) 0];
 rlocus(num_int,den_int)
 
-
-K_int = 0;
+%Trouver automatiquement le gain
+[r,p,k]=residue(num_int,den_int);
+Intersection = sum(p)/(length(den_int)-1);
+K_int = (((-1)*den_int(1)*(Intersection^2))+((-1)*den_int(2)*(Intersection^1)))/(num_int(1));
 
 FTBF_TF1 = feedback(TF1, K_int);
-
 
 %% Sortie du Simulink Linéraire
 %On a trouver que le meilleur stop time est de 11.258427 pour que ce soit le même nombre de points que la variable servo

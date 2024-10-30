@@ -90,8 +90,8 @@ rlocus(num_int,den_int)
 
 %Trouver automatiquement le gain
 [r,p,k]=residue(num_int,den_int);
-Intersection = sum(p)/(length(den_int)-1)
-K_int = (((-1)*den_int(1)*(Intersection^2))+((-1)*den_int(2)*(Intersection^1)))/(num_int(1))
+Intersection = sum(p)/(length(den_int)-1);
+K_int = (((-1)*den_int(1)*(Intersection^2))+((-1)*den_int(2)*(Intersection^1)))/(num_int(1));
 
 FTBF_TF1 = feedback(TF1, K_int);
 
