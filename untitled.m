@@ -102,6 +102,7 @@ figure
 step(FTBFfinalpd)
 figure
 stepinfo(FTBFfinalpd)
+
 %% Test résidue
 numfinal = [0.4161];
 denfinal = [6.918e-05 0.01078 0.4207 0 0];

@@ -49,7 +49,7 @@ J_c = Iden.J_c;
 B_eq = Iden.B_eq;
 tsimu = Iden.tsimu;
 Vm = Iden.Vm;
-servo = Iden.servo;
+theta_c = Iden.servo;
 
 %% Matrices A,B,C,D
 %On resort nos matrices A,B,C,D en fonction de J_eq et de B_eq
@@ -69,42 +69,61 @@ C = [1 0 0 0;
 D = [0;
      0];
 
-%Sortir les fonction de transfert
+%% Sortir les fonction de transfert
+%Fonction de base Theta_c/V_m
+num_mot = [K_g*n_m*n_g*k_t];
+den_mot = [R_m*J_eq  (R_m*B_eq+n_g*n_m*k_m*k_t*K_g.^2) 0];
+TF_mot = tf(num_mot, den_mot);
 %Fonction de Omega_c/V_m
-num = [K_g*n_m*n_g*k_t];
-den = [R_m*J_eq  (R_m*B_eq+n_g*n_m*k_m*k_t*K_g.^2)];
-%Fonction de V_x/Omega_C
-num1 = [5*g*r_arm];
-den1 = [7*L 0];
+num_mot_simu = [K_g*n_m*n_g*k_t];
+den_mot_simu = [R_m*J_eq  (R_m*B_eq+n_g*n_m*k_m*k_t*K_g.^2)];
 
-TF1 = tf(num, den);
-TF2 = tf(num1, den1);
-%[num, den] = ss2tf(A, B, C, D);
-% TF1 = tf(num(1,:), den);
-% TF2 = tf(num(2,:), den);
+%Fonction de base X/theta_c
+num_bille = [5*g*r_arm];
+den_bille = [7*L 0 0];
+TF_bille = tf(num_bille, den_bille);
+%Fonction de V_x/theta_C
+num_bille_simu = [5*g*r_arm];
+den_bille_simu = [7*L 0];
 
 %% Rlocus pour boucle interne
+% Graphique
 figure
-num_int = [K_g*n_m*n_g*k_t];
-den_int = [R_m*J_eq  (R_m*B_eq+n_g*n_m*k_m*k_t*K_g.^2) 0];
-rlocus(num_int,den_int)
+rlocus(num_mot,den_mot)
 
 %Trouver automatiquement le gain
-[r,p,k]=residue(num_int,den_int);
-Intersection = sum(p)/(length(den_int)-1);
-K_int = (((-1)*den_int(1)*(Intersection^2))+((-1)*den_int(2)*(Intersection^1)))/(num_int(1));
+[~,p,~]=residue(num_mot,den_mot);
+Intersection = sum(p)/(length(den_mot)-1)
+K_cri = (((-1)*den_mot(1)*(Intersection^2))+((-1)*den_mot(2)*(Intersection^1)))/(num_mot(1));
 
-FTBF_TF1 = feedback(TF1, K_int);
+%Trouver pour zeta = 0.8
+angle_Phi = acos(0.8);
+Imaginaire = Intersection*tan(angle_Phi);
+Inter = Intersection + Imaginaire*i;
 
-%% Sortie du Simulink Linéraire
+K_int = real((((-1)*den_mot(1)*(Inter^2))+((-1)*den_mot(2)*(Inter^1)))/(num_mot(1)));
+
+
+%% SC-3
+% figure
+% hold on
+% lsim(TF3, Vm, tsimu);
+% % On sort theta_c
+% plot(tsimu, (theta_c-theta_c(1)))
+% legend(["TF", "\Theta_c"])
+
+%% Modèle Simulink Linéraire
 %On a trouver que le meilleur stop time est de 11.258427 pour que ce soit le même nombre de points que la variable servo
-Sim_Lin = sim('Modele_Lineaire.slx',"StopTime","10");
+Sim_Lin = sim('Modele_Lineaire.slx');
 
-% Validation que l'angle des servo sont les mêmes que ceux données par le fichier de donnée
-% test1  = ((servo(170)-servo(160))/(tsimu(170)-tsimu(160)))
-% test2  = ((Sim_Lin.Theta_C.Data(170)-Sim_Lin.Theta_C.data(160))/(Sim_Lin.Theta_C.Time(170)-Sim_Lin.Theta_C.Time(160)))
-
-%% Sortie du Simulink Non-Linéaire
+%% Modèle Simulink Non-Linéaire
 Sim_Non_Lin = sim('Modele_Non_Lineaire.slx');
+
+%% Modèle Simulink asservi
+%Fermer la boucle (theta_c/V_m) avec K_int
+FTBF_TF_mot = feedback(K_int*TF_mot, 1);
+
+
+disp("Hello World")
 
 
