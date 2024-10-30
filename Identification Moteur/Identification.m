@@ -19,14 +19,14 @@ P = polyfit(tsimu(1:end-1), omega_c, 15);
 Omega_c = polyval(P, tsimu(1:end-1));
 
 % Plot pour montrer du lissage vs pas lisser
-figure
-hold on
-plot(tsimu(1:end-1), Omega_c, 'black')
-plot(tsimu(1:end-1), omega_c, 'red')
-title("Méthode de lissage");
-xlabel("Temps (s)");
-ylabel("Vitesse (rad/s)");
-legend(["Lisser", "Non-Lisser"]);
+% figure
+% hold on
+% plot(tsimu(1:end-1), Omega_c, 'black')
+% plot(tsimu(1:end-1), omega_c, 'red')
+% title("Méthode de lissage");
+% xlabel("Temps (s)");
+% ylabel("Vitesse (rad/s)");
+% legend(["Lisser", "Non-Lisser"]);
 
 %% Calcul des coefficient Fonction de transfert
 dT = tsimu(2);
@@ -68,20 +68,20 @@ sys = tf([A_iden(1)],[-1*A_iden(2) 1]);
 y = lsim(sys,Vm(1:end-1),tsimu(1:end-1));
 
 % Graphiques
-figure
-hold on
-plot(tsimu(1:end-1),omega_c(1:end), 'red')
-plot(tsimu(1:end-1), y, 'black')
-title("Comparaison de la fonction de transfert obtenu avec la méthode des moindres carrées et les vrai données");
-xlabel("Temps (s)");
-ylabel("Vitesse (rad/s)");
-legend(["Vrai données", "Fonction de transfert"]);
+% figure
+% hold on
+% plot(tsimu(1:end-1),omega_c(1:end), 'red')
+% plot(tsimu(1:end-1), y, 'black')
+% title("Comparaison de la fonction de transfert obtenu avec la méthode des moindres carrées et les vrai données");
+% xlabel("Temps (s)");
+% ylabel("Vitesse (rad/s)");
+% legend(["Vrai données", "Fonction de transfert"]);
 
 %% Erreur
 % RMSE
 RMSE = sqrt((1/length(omega_c))*(sum((y-omega_c).^2)))
 % R^2
-Y_ = (1/length(omega_c))*sum(omega_c)
+Y_ = (1/length(omega_c))*sum(omega_c);
 R_2 = sum((y-Y_).^2)/(sum((omega_c-Y_).^2))
 
 %% Save les valeurs 
