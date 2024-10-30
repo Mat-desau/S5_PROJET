@@ -9,9 +9,12 @@ load("data_1v_4-09_100hz.mat");
 % omega_c - vitesse angulaire
 % tsimu - temps de simulation
 
-%% Lissage des courbes
+%On a trouver que omega_c et servo sont en degrée et non en rad
+servo = deg2rad(servo);
 omega_c = deg2rad(omega_c);
 
+%% Lissage des courbes
+% Création du lissage
 P = polyfit(tsimu(1:end-1), omega_c, 15);
 Omega_c = polyval(P, tsimu(1:end-1));
 
