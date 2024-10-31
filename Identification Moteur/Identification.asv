@@ -15,10 +15,24 @@ omega_c = deg2rad(omega_c);
 
 %% Lissage des courbes
 % Création du lissage
-P = polyfit(tsimu(1:end-1), omega_c, 22);
-Omega_c = polyval(P, tsimu(1:end-1));
+% P = polyfit(tsimu(1:end-1), omega_c, 22);
+% Omega_c = polyval(P, tsimu(1:end-1));
 
-fit
+Min = 101;
+Max = 106;
+
+A = mean(omega_c(Max:end))
+C = [ones(length(tsimu(Min:Max)),1), tsimu(Min:Max)];
+Y = real(log((A-omega_c(Min:Max))./(omega_c(Min:Max))));
+
+Mat_A = pinv(C)*Y
+b = (-1)*Mat_A(2)
+c = (Mat_A(1)/b)
+
+Omega_c = (A)./(1+(exp((-b)*(tsimu(1:end-1)-(c)))));
+
+% P = fit(tsimu(1:end-1), omega_c, 'logistic')
+% Omega_c = (P.a)./(1+(exp((-P.b)*(tsimu(1:end-1)-(P.c)))));
 
 % Plot pour montrer du lissage vs pas lisser
 % figure

@@ -15,21 +15,35 @@ omega_c = deg2rad(omega_c);
 
 %% Lissage des courbes
 % Création du lissage
-%P = polyfit(tsimu(1:end-1), omega_c, 22);
-%Omega_c = polyval(P, tsimu(1:end-1));
+% P = polyfit(tsimu(1:end-1), omega_c, 22);
+% Omega_c = polyval(P, tsimu(1:end-1));
 
-P = fit(tsimu(1:end-1), omega_c, 'logistic');
-Omega_c = (P.a)./(1+exp((-P.b)*(tsimu(1:end-1)-(P.c))));
+Min = 101;
+Max = 107;
+
+A = mean(omega_c(Max:end))
+A = 1.6107;
+C = [ones(length(tsimu(Min:Max)),1), tsimu(Min:Max)];
+Y = real(log((A-omega_c(Min:Max))./(omega_c(Min:Max))));
+
+Mat_A = pinv(C)*Y
+b = (-1)*Mat_A(2)
+c = (Mat_A(1)/b)
+
+Omega_c = (A)./(1+(exp((-b)*(tsimu(1:end-1)-(c)))));
+
+% P = fit(tsimu(1:end-1), omega_c, 'logistic')
+% Omega_c = (P.a)./(1+(exp((-P.b)*(tsimu(1:end-1)-(P.c)))));
 
 % Plot pour montrer du lissage vs pas lisser
-figure
-hold on
-plot(tsimu(1:end-1), Omega_c, 'black')
-plot(tsimu(1:end-1), omega_c, 'red')
-title("Méthode de lissage");
-xlabel("Temps (s)");
-ylabel("Vitesse (rad/s)");
-legend(["Lisser", "Non-Lisser"]);
+% figure
+% hold on
+% plot(tsimu(1:end-1), Omega_c, 'black')
+% plot(tsimu(1:end-1), omega_c, 'red')
+% title("Méthode de lissage");
+% xlabel("Temps (s)");
+% ylabel("Vitesse (rad/s)");
+% legend(["Lisser", "Non-Lisser"]);
 
 %% Calcul des coefficient Fonction de transfert
 dT = tsimu(2);

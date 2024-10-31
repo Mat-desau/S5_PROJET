@@ -3,8 +3,6 @@ clear all
 close all
 warning off
 
-
-
 %% Mise en valeur
 %Charge et engrenage
 n_g = 0.9000;
@@ -61,8 +59,6 @@ Vm2((tsimu2 >= 1) & (tsimu2 <= 3)) = 1;
 tsimu3 = [0:0.01:10]';
 Vm3 = zeros(length(tsimu3),1);
 Vm3((tsimu3 >= 1) & (tsimu3 <= 1.2)) = 1;
-
-disp(Vm3)
 
 
 %% Matrices A,B,C,D
@@ -128,10 +124,10 @@ K_int = real((((-1)*den_mot(1)*(Inter^2))+((-1)*den_mot(2)*(Inter^1)))/(num_mot(
 
 %% Modèle Simulink Linéraire
 %On a trouver que le meilleur stop time est de 11.258427 pour que ce soit le même nombre de points que la variable servo
-Sim_Lin = sim('Modele_Lineaire.slx');
+Sim_Lin = sim('Modele_Lineaire.slx', 'stoptime', '3');
 
 %% Modèle Simulink Non-Linéaire
-Sim_Non_Lin = sim('Modele_Non_Lineaire.slx');
+Sim_Non_Lin = sim('Modele_Non_Lineaire.slx', 'stoptime', '3');
 
 %% Modèle Simulink asservi
 %Fermer la boucle (theta_c/V_m) avec K_int
