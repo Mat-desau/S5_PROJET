@@ -122,7 +122,9 @@ Sim_Non_Lin = sim('Modele_Non_Lineaire.slx');
 %% Modèle Simulink asservi
 %Fermer la boucle (theta_c/V_m) avec K_int
 FTBF_TF_mot = feedback(K_int*TF_mot, 1);
+[num_FTBF_mot, den_FTBF_mot] = tfdata(FTBF_TF_mot, 'v');
 
+[A,B,C,D] = tf2ss(FTBF_TF_mot)
 
 disp("Hello World")
 
