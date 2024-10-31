@@ -3,6 +3,8 @@ clear all
 close all
 warning off
 
+
+
 %% Mise en valeur
 %Charge et engrenage
 n_g = 0.9000;
@@ -51,6 +53,18 @@ tsimu = Iden.tsimu;
 Vm = Iden.Vm;
 theta_c = Iden.servo;
 
+% Pour simulation Simulink
+tsimu2 = [0:0.01:3]';
+Vm2 = zeros(length(tsimu2),1);
+Vm2((tsimu2 >= 1) & (tsimu2 <= 3)) = 1;
+
+tsimu3 = [0:0.01:10]';
+Vm3 = zeros(length(tsimu3),1);
+Vm3((tsimu3 >= 1) & (tsimu3 <= 1.2)) = 1;
+
+disp(Vm3)
+
+
 %% Matrices A,B,C,D
 %On resort nos matrices A,B,C,D en fonction de J_eq et de B_eq
 A = [0 1            0                                       0;
@@ -88,12 +102,12 @@ den_bille_simu = [7*L 0];
 
 %% Rlocus pour boucle interne
 % Graphique
-figure
-rlocus(num_mot,den_mot)
+% figure
+% rlocus(num_mot,den_mot)
 
 %Trouver automatiquement le gain
 [~,p,~]=residue(num_mot,den_mot);
-Intersection = sum(p)/(length(den_mot)-1)
+Intersection = sum(p)/(length(den_mot)-1);
 K_cri = (((-1)*den_mot(1)*(Intersection^2))+((-1)*den_mot(2)*(Intersection^1)))/(num_mot(1));
 
 %Trouver pour zeta = 0.8
@@ -124,7 +138,7 @@ Sim_Non_Lin = sim('Modele_Non_Lineaire.slx');
 FTBF_TF_mot = feedback(K_int*TF_mot, 1);
 [num_FTBF_mot, den_FTBF_mot] = tfdata(FTBF_TF_mot, 'v');
 
-[A,B,C,D] = tf2ss(FTBF_TF_mot)
+%[A,B,C,D] = tf2ss(FTBF_TF_mot)
 
 disp("Hello World")
 
