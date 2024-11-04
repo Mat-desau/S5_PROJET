@@ -132,7 +132,6 @@ Sim_Lin = sim('Modele_Lineaire.slx');
 Sim_Non_Lin = sim('Modele_Non_Lineaire.slx');
 
 %% Modèle Simulink asservi
-clc
 % Boucle interne
 %Test d'asservissement
 Test_Angle = pi/4;
@@ -154,9 +153,9 @@ clear num_temp den_temp r p k poids
 % Boucle Externe
 %Variables
 M_p = 5; % Important ceci est en pourcent
-t_s = 4; % s
-t_r = 2; % s
-t_p = 3; % s
+t_s = 4; % sec
+t_r = 2; % sec
+t_p = 3; % sec
 
 %Calculs
 Phi = atan((-pi) / log(M_p/100));
@@ -197,6 +196,11 @@ clear Z_temp P_temp Phi_z Phi_p Alpha Delta_phi
 % 
 % figure
 % rlocus(TF_FTBO_ext, 'red')
+
+figure
+rlocus(FTBF_TF_int_ordre4, 'red')
+hold on
+rlocus(FTBF_TF_int, 'black')
 
 % Ouvrir Simulink
 Sim_Asservi = sim('Modele_Lineaire_Asservi.slx');

@@ -21,14 +21,14 @@ omega_c = deg2rad(omega_c);
 Min = 101;
 Max = 107;
 
-A = mean(omega_c(Max:end))
-A = 1.6107;
+A = mean(omega_c(Max:end));
+% A = 1.6107; % Celui à Mathis
 C = [ones(length(tsimu(Min:Max)),1), tsimu(Min:Max)];
 Y = real(log((A-omega_c(Min:Max))./(omega_c(Min:Max))));
 
-Mat_A = pinv(C)*Y
-b = (-1)*Mat_A(2)
-c = (Mat_A(1)/b)
+Mat_A = pinv(C)*Y;
+b = (-1)*Mat_A(2);
+c = (Mat_A(1)/b);
 
 Omega_c = (A)./(1+(exp((-b)*(tsimu(1:end-1)-(c)))));
 
