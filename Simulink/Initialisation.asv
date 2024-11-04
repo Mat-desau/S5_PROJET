@@ -102,7 +102,7 @@ den_bille_simu = [7*L 0];
 
 %Trouver automatiquement le gain
 [~,p,~]=residue(num_mot,den_mot);
-Intersection = sum(p)/(length(den_mot)-1)
+Intersection = sum(p)/(length(den_mot)-1);
 K_cri = (((-1)*den_mot(1)*(Intersection^2)) + ((-1)*den_mot(2)*(Intersection^1))) / (num_mot(1));
 
 %Trouver pour zeta = 0.8
@@ -110,7 +110,7 @@ angle_Phi = acos(0.8);
 Imaginaire = Intersection*tan(angle_Phi);
 Inter = Intersection + Imaginaire*i;
 
-K_int = real((((-1)*den_mot(1)*(Inter^2)) + ((-1)*den_mot(2)*(Inter^1))) / (num_mot(1)))
+K_int = real((((-1)*den_mot(1)*(Inter^2)) + ((-1)*den_mot(2)*(Inter^1))) / (num_mot(1)));
 
 %Enlever non-utiliser
 clear Imaginaire angle_Phi Intersection Inter p
@@ -140,16 +140,6 @@ Test_Angle = pi/4;
 FTBF_TF_mot = feedback(K_int*TF_mot, 1);
 FTBF_TF_int_ordre4 = FTBF_TF_mot * TF_bille;
 
-%On doit diminuer à une ordre 2
-[num_temp, den_temp] = tfdata(FTBF_TF_int_ordre4, 'v');
-[r, p, k] = residue(num_temp, den_temp);
-poids = abs(r)./abs(real(p));
-FTBF_TF_int = tf([r(3)], [1 -p(3)]) + tf([r(4)], [1 -p(4)]);
-clear num_temp den_temp r p k poids
-
-%[num_FTBF_mot, den_FTBF_mot] = tfdata(FTBF_TF_mot, 'v');
-%[A,B,C,D] = tf2ss(FTBF_TF_mot)
-
 % Boucle Externe
 %Variables
 M_p = 5; % Important ceci est en pourcent
@@ -157,50 +147,76 @@ t_s = 4; % sec
 t_r = 2; % sec
 t_p = 3; % sec
 
-%Calculs
+%Calculs par bisectrice
 Phi = atan((-pi) / log(M_p/100));
 Zeta = cos(Phi);
 Omega_a = pi / t_p;
-Omega_n = Omega_a / sqrt(1-Zeta^2);
-%Omega_n = 4 / (Zeta*t_s);
-P_etoile = (Omega_n*Zeta)*(-1) + Omega_a*i; 
-    % frsp = evalfr(FTBF_TF_int, P_etoile)
-    % 
-    % Angle_FTBF_TF_int = rad2deg(angle(frsp))
-    % Mag_FTBF_TF_int = abs(frsp)
-    % clear frsp
+    % Omega_n = Omega_a / sqrt(1-Zeta^2)
+    % Omega_n = (1+(1.1*Zeta)+(1.4*Zeta^2)) / t_r
+Omega_n = 4 / (Zeta*t_s); % On prends celle-ci car elle a Omega_n le plus haut
+
+P_etoile = (((-1)*Omega_n*Zeta) + Omega_a*i);
+
+%Trouver notre angle pour P_etoile
+frsp = evalfr(FTBF_TF_int_ordre4, P_etoile);
+Angle_FTBF_TF_int = rad2deg(angle(frsp)) - 360;
+% Mag_FTBF_TF_int = abs(frsp);
+clear frsp 
 
 %Calcul de l'avance de phase comme dans le document
-Delta_phi = 0;
+Delta_phi = deg2rad(-180 - Angle_FTBF_TF_int);
 Alpha = pi - Phi;
-Phi_z = (Alpha + Delta_phi) / 2;
-Phi_p = (Alpha - Delta_phi) / 2;
+Phi_z = ((Alpha + Delta_phi) / 2);
+Phi_p = ((Alpha - Delta_phi) / 2);
 Z_temp = real(P_etoile) - (imag(P_etoile) / tan(Phi_z));
 P_temp = real(P_etoile) - (imag(P_etoile) / tan(Phi_p));
+
 %Pour faire l'étape finale
 TF_PD = tf([1 -Z_temp], [1 -P_temp]);
-TF_FTBO_ext = TF_PD * FTBF_TF_int;
-K_a = 1 / abs(evalfr(TF_FTBO_ext, P_etoile));
+TF_FTBO_ext_Bi = TF_PD * FTBF_TF_int_ordre4;
+K_a = 1 / abs(evalfr(TF_FTBO_ext_Bi, P_etoile));
 
 %Creation des nouvelles TF
 TF_PD = TF_PD * K_a;
-TF_FTBO_ext = TF_FTBO_ext * K_a;
-TF_FTBF_ext = feedback(TF_FTBO_ext, 1);
+TF_FTBO_ext_Bi = TF_FTBO_ext_Bi * K_a;
+TF_FTBF_ext_Bi = feedback(TF_FTBO_ext_Bi, 1);
+
+        % figure
+        % step(TF_FTBF_ext_Bi)
+        %stepinfo(TF_FTBF_ext_Bi)
+        % 
+        % figure
+        % hold on
+        % rlocus(TF_FTBO_ext_Bi, 'red');
+        % scatter(real(P_etoile),imag(P_etoile), '^', "blue");
+        % scatter(real(P_etoile),imag(-P_etoile), '^', "blue");
 
 %Enlever non-utiliser
-clear Z_temp P_temp Phi_z Phi_p Alpha Delta_phi
+clear Z_temp P_temp Phi_z Phi_p Alpha K_a Zeta Delta_phi Angle_FTBF_TF_int Omega_n Omega_a Phi P_etoile
 
-% figure
-% step(TF_FTBF_ext)
-% stepinfo(TF_FTBF_ext)
-% 
-% figure
-% rlocus(TF_FTBO_ext, 'red')
+% Calcul par Bode 
+% Variables
+PM = 45; % deg
+BW = 2.3; % rad/s
+Echelon_Saturation = 6; % cm
 
+FTBO_TF_ext = FTBF_TF_int_ordre4;
+
+% Début des calculs
+Zeta = (1/2)*sqrt(tand(PM)*sind(PM));
+Omega_g_etoile = BW * ((sqrt(sqrt(1+(4*(Zeta^4)))-(2*(Zeta^2)))) / (sqrt((1-(2*Zeta^2))+sqrt((4*Zeta^4)-(4*Zeta^2)+2))))
+K_etoile = 1 / evalfr(FTBO_TF_ext, (Omega_g_etoile*i))
+
+[GM_temp, PM_temp, Omega_p_temp, Omega_g_temp] = margin(FTBO_TF_ext*K_etoile)
+
+temp = angle(evalfr(FTBO_TF_ext*K_etoile, (Omega_g_etoile*i)))
+PM_temp2 = temp - (-pi)
+
+% 2
 figure
-rlocus(FTBF_TF_int_ordre4, 'red')
-hold on
-rlocus(FTBF_TF_int, 'black')
+margin((FTBO_TF_ext*K_etoile))
+
+%[~,temp, ~,~] = margin(TF_mot, phase(1,1,:),(Omega_g*i))
 
 % Ouvrir Simulink
 Sim_Asservi = sim('Modele_Lineaire_Asservi.slx');
