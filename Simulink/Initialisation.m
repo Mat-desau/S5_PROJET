@@ -172,51 +172,62 @@ Z_temp = real(P_etoile) - (imag(P_etoile) / tan(Phi_z));
 P_temp = real(P_etoile) - (imag(P_etoile) / tan(Phi_p));
 
 %Pour faire l'étape finale
-TF_PD = tf([1 -Z_temp], [1 -P_temp]);
-TF_FTBO_ext_Bi = TF_PD * FTBF_TF_int_ordre4;
+TF_PD_Bi = tf([1 -Z_temp], [1 -P_temp]);
+TF_FTBO_ext_Bi = TF_PD_Bi * FTBF_TF_int_ordre4;
 K_a = 1 / abs(evalfr(TF_FTBO_ext_Bi, P_etoile));
 
 %Creation des nouvelles TF
-TF_PD = TF_PD * K_a;
+TF_PD_Bi = TF_PD_Bi * K_a;
 TF_FTBO_ext_Bi = TF_FTBO_ext_Bi * K_a;
 TF_FTBF_ext_Bi = feedback(TF_FTBO_ext_Bi, 1);
 
-        % figure
-        % step(TF_FTBF_ext_Bi)
-        %stepinfo(TF_FTBF_ext_Bi)
-        % 
-        % figure
-        % hold on
-        % rlocus(TF_FTBO_ext_Bi, 'red');
-        % scatter(real(P_etoile),imag(P_etoile), '^', "blue");
-        % scatter(real(P_etoile),imag(-P_etoile), '^', "blue");
+        figure
+        step(TF_FTBF_ext_Bi)
+        stepinfo(TF_FTBF_ext_Bi)
+
+        figure
+        hold on
+        rlocus(TF_FTBO_ext_Bi, 'red');
+        scatter(real(P_etoile),imag(P_etoile), '^', "blue");
+        scatter(real(P_etoile),imag(-P_etoile), '^', "blue");
+
+        figure 
+        pzmap(TF_FTBF_ext_Bi)
 
 %Enlever non-utiliser
 clear Z_temp P_temp Phi_z Phi_p Alpha K_a Zeta Delta_phi Angle_FTBF_TF_int Omega_n Omega_a Phi P_etoile
 
 % Calcul par Bode 
 % Variables
-PM = 45; % deg
+PM_etoile = 45; % deg
 BW = 2.3; % rad/s
 Echelon_Saturation = 6; % cm
 
 FTBO_TF_ext = FTBF_TF_int_ordre4;
 
 % Début des calculs
-Zeta = (1/2)*sqrt(tand(PM)*sind(PM));
-Omega_g_etoile = BW * ((sqrt(sqrt(1+(4*(Zeta^4)))-(2*(Zeta^2)))) / (sqrt((1-(2*Zeta^2))+sqrt((4*Zeta^4)-(4*Zeta^2)+2))))
-K_etoile = 1 / evalfr(FTBO_TF_ext, (Omega_g_etoile*i))
+Zeta = (1/2)*sqrt(tand(PM_etoile)*sind(PM_etoile));
+Omega_g_etoile = BW * ((sqrt(sqrt(1+(4*(Zeta^4)))-(2*(Zeta^2)))) / (sqrt((1-(2*Zeta^2))+sqrt((4*Zeta^4)-(4*Zeta^2)+2))));
+K_etoile = 1 / abs(evalfr(FTBO_TF_ext, (Omega_g_etoile*i)));
+% [GM_temp, PM_temp, Omega_p_temp, Omega_g_temp] = margin(FTBO_TF_ext*K_etoile)
+PM = angle(evalfr(FTBO_TF_ext*K_etoile, (Omega_g_etoile*i))) - pi
+Delta_phi = deg2rad(PM_etoile) - PM
+Alpha = (1 - sin(Delta_phi)) / (1 + sin(Delta_phi))
+T = 1 / (Omega_g_etoile * sqrt(Alpha))
+K_a = K_etoile / sqrt(Alpha)
 
-[GM_temp, PM_temp, Omega_p_temp, Omega_g_temp] = margin(FTBO_TF_ext*K_etoile)
+% Fonction de transfert
+TF_PD_Bode = tf([K_a*Alpha*T K_a*Alpha], [Alpha*T 1]);
+TF_FTBO_ext_Bode = TF_PD_Bode * FTBO_TF_ext;
+TF_FTBF_ext_Bode = feedback(TF_FTBO_ext_Bode, 1);
 
-temp = angle(evalfr(FTBO_TF_ext*K_etoile, (Omega_g_etoile*i))) - 2*pi
-PM_temp2 = temp - (-pi)
+        figure
+        step(TF_FTBF_ext_Bode)
+        stepinfo(TF_FTBF_ext_Bode)
 
-% 2
-figure
-margin((FTBO_TF_ext*K_etoile))
-
-%[~,temp, ~,~] = margin(TF_mot, phase(1,1,:),(Omega_g*i))
+        figure
+        hold on
+        margin(TF_FTBO_ext_Bode);
 
 % Ouvrir Simulink
 Sim_Asservi = sim('Modele_Lineaire_Asservi.slx');
