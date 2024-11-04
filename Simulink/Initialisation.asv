@@ -175,7 +175,7 @@ P_temp = real(P_etoile) - (imag(P_etoile) / tan(Phi_p));
 %Pour faire l'étape finale
 TF_PD_Bi = tf([1 -Z_temp], [1 -P_temp]);
 TF_FTBO_ext_Bi = TF_PD_Bi * FTBF_TF_int_ordre4;
-K_a = 1 / abs(evalfr(TF_FTBO_ext_Bi, P_etoile));
+K_a = 1 / abs(evalfr(TF_FTBO_ext_Bi, P_etoile))
 
 %Creation des nouvelles TF
 TF_PD_Bi = TF_PD_Bi * K_a;
@@ -185,14 +185,14 @@ TF_FTBF_ext_Bi = feedback(TF_FTBO_ext_Bi, 1);
 
         % figure
         % step(TF_FTBF_ext_Bi)
-        % stepinfo(TF_FTBF_ext_Bi)
+        stepinfo(TF_FTBF_ext_Bi)
         % 
         % figure
         % hold on
         % rlocus(TF_FTBO_ext_Bi, 'red');
         % scatter(real(P_etoile),imag(P_etoile), '^', "blue");
         % scatter(real(P_etoile),imag(-P_etoile), '^', "blue");
-        % 
+
         % figure 
         % pzmap(TF_FTBF_ext_Bi)
 
@@ -232,18 +232,46 @@ TF_FTBF_ext_Bode = feedback(TF_FTBO_ext_Bode, 1);
         % hold on
         % margin(TF_FTBO_ext_Bode);
 
+X_num = TF_PD_Bi_Num;
+X_den = TF_PD_Bi_Den;
 % Ouvrir Simulink
-Sim_Asservi = sim('Modele_Lineaire_Asservi.slx');
+Sim_Asservi1 = sim('Modele_Lineaire_Asservi.slx');
+
+X_num = TF_PD_Bode_Num;
+X_den = TF_PD_Bode_Den;
+% Ouvrir Simulink
+Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx');
 
 
-figure
-subplot(3,1,1)
-plot(Sim_Asservi.Vm_out)
-title("V_m")
-subplot(3,1,2)
-plot(Sim_Asservi.X)
-title("X")
-subplot(3,1,3)
-plot(Sim_Asservi.Theta_C.Time, rad2deg(Sim_Asservi.Theta_C.Data))
+% figure
+% sgtitle("Graphiques des asservissements")
+% subplot(4,1,1)
+% hold on
+% plot(Sim_Asservi1.Vm_out)
+% plot(Sim_Asservi2.Vm_out)
+% title("V_m")
+% legend(["Bi", "Bode"])
+% ylabel("Tension (V)")
+% subplot(4,1,2)
+% hold on
+% plot(Sim_Asservi1.X)
+% plot(Sim_Asservi2.X)
+% title("X")
+% legend(["Bi", "Bode"])
+% ylabel("Position (m)")
+% subplot(4,1,3)
+% hold on
+% plot(Sim_Asservi1.Theta_C.Time, rad2deg(Sim_Asservi1.Theta_C.Data))
+% plot(Sim_Asservi2.Theta_C.Time, rad2deg(Sim_Asservi2.Theta_C.Data))
+% title("\Theta_C")
+% legend(["Bi", "Bode"])
+% ylabel("Angle (deg)")
+% subplot(4,1,4)
+% hold on
+% plot(Sim_Asservi1.Theta_Cd.Time, rad2deg(Sim_Asservi1.Theta_Cd.Data))
+% plot(Sim_Asservi2.Theta_Cd.Time, rad2deg(Sim_Asservi2.Theta_Cd.Data))
+% title("\Theta_C_d")
+% legend(["Bi", "Bode"])
+% ylabel("Angle (deg)")
 
 disp("Hello World")
