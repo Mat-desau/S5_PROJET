@@ -135,6 +135,7 @@ Sim_Non_Lin = sim('Modele_Non_Lineaire.slx');
 % Boucle interne
 %Test d'asservissement
 Test_Angle = pi/4;
+Test_Position = 0.06; % m
 
 %Fermer la boucle (theta_c/V_m) avec K_int
 FTBF_TF_mot = feedback(K_int*TF_mot, 1);
@@ -178,21 +179,22 @@ K_a = 1 / abs(evalfr(TF_FTBO_ext_Bi, P_etoile));
 
 %Creation des nouvelles TF
 TF_PD_Bi = TF_PD_Bi * K_a;
+[TF_PD_Bi_Num, TF_PD_Bi_Den]  = tfdata(TF_PD_Bi, 'v');
 TF_FTBO_ext_Bi = TF_FTBO_ext_Bi * K_a;
 TF_FTBF_ext_Bi = feedback(TF_FTBO_ext_Bi, 1);
 
-        figure
-        step(TF_FTBF_ext_Bi)
-        stepinfo(TF_FTBF_ext_Bi)
-
-        figure
-        hold on
-        rlocus(TF_FTBO_ext_Bi, 'red');
-        scatter(real(P_etoile),imag(P_etoile), '^', "blue");
-        scatter(real(P_etoile),imag(-P_etoile), '^', "blue");
-
-        figure 
-        pzmap(TF_FTBF_ext_Bi)
+        % figure
+        % step(TF_FTBF_ext_Bi)
+        % stepinfo(TF_FTBF_ext_Bi)
+        % 
+        % figure
+        % hold on
+        % rlocus(TF_FTBO_ext_Bi, 'red');
+        % scatter(real(P_etoile),imag(P_etoile), '^', "blue");
+        % scatter(real(P_etoile),imag(-P_etoile), '^', "blue");
+        % 
+        % figure 
+        % pzmap(TF_FTBF_ext_Bi)
 
 %Enlever non-utiliser
 clear Z_temp P_temp Phi_z Phi_p Alpha K_a Zeta Delta_phi Angle_FTBF_TF_int Omega_n Omega_a Phi P_etoile
@@ -210,26 +212,58 @@ Zeta = (1/2)*sqrt(tand(PM_etoile)*sind(PM_etoile));
 Omega_g_etoile = BW * ((sqrt(sqrt(1+(4*(Zeta^4)))-(2*(Zeta^2)))) / (sqrt((1-(2*Zeta^2))+sqrt((4*Zeta^4)-(4*Zeta^2)+2))));
 K_etoile = 1 / abs(evalfr(FTBO_TF_ext, (Omega_g_etoile*i)));
 % [GM_temp, PM_temp, Omega_p_temp, Omega_g_temp] = margin(FTBO_TF_ext*K_etoile)
-PM = angle(evalfr(FTBO_TF_ext*K_etoile, (Omega_g_etoile*i))) - pi
-Delta_phi = deg2rad(PM_etoile) - PM
-Alpha = (1 - sin(Delta_phi)) / (1 + sin(Delta_phi))
-T = 1 / (Omega_g_etoile * sqrt(Alpha))
-K_a = K_etoile / sqrt(Alpha)
+PM = angle(evalfr(FTBO_TF_ext*K_etoile, (Omega_g_etoile*i))) - pi;
+Delta_phi = deg2rad(PM_etoile) - PM;
+Alpha = (1 - sin(Delta_phi)) / (1 + sin(Delta_phi));
+T = 1 / (Omega_g_etoile * sqrt(Alpha));
+K_a = K_etoile / sqrt(Alpha);
 
 % Fonction de transfert
 TF_PD_Bode = tf([K_a*Alpha*T K_a*Alpha], [Alpha*T 1]);
+[TF_PD_Bode_Num, TF_PD_Bode_Den]  = tfdata(TF_PD_Bode, 'v');
 TF_FTBO_ext_Bode = TF_PD_Bode * FTBO_TF_ext;
 TF_FTBF_ext_Bode = feedback(TF_FTBO_ext_Bode, 1);
 
-        figure
-        step(TF_FTBF_ext_Bode)
-        stepinfo(TF_FTBF_ext_Bode)
+        % figure
+        % step(TF_FTBF_ext_Bode)
+        % stepinfo(TF_FTBF_ext_Bode)
+        % 
+        % figure
+        % hold on
+        % margin(TF_FTBO_ext_Bode);
 
-        figure
-        hold on
-        margin(TF_FTBO_ext_Bode);
-
+X_num = TF_PD_Bi_Num;
+X_den = TF_PD_Bi_Den;
 % Ouvrir Simulink
-Sim_Asservi = sim('Modele_Lineaire_Asservi.slx');
+Sim_Asservi1 = sim('Modele_Lineaire_Asservi.slx');
+
+X_num = TF_PD_Bode_Num;
+X_den = TF_PD_Bode_Den;
+% Ouvrir Simulink
+Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx');
+
+
+figure
+subplot(3,1,1)
+hold on
+plot(Sim_Asservi1.Vm_out)
+plot(Sim_Asservi2.Vm_out)
+title("V_m")
+legend(["Bi", "Bode"])
+ylabel("Tension (V)")
+subplot(3,1,2)
+hold on
+plot(Sim_Asservi1.X)
+plot(Sim_Asservi2.X)
+title("X")
+legend(["Bi", "Bode"])
+ylabel("Position (m)")
+subplot(3,1,3)
+hold on
+plot(Sim_Asservi1.Theta_C.Time, rad2deg(Sim_Asservi1.Theta_C.Data))
+plot(Sim_Asservi2.Theta_C.Time, rad2deg(Sim_Asservi2.Theta_C.Data))
+title("Theta_C")
+legend(["Bi", "Bode"])
+ylabel("Angle (deg)")
 
 disp("Hello World")
