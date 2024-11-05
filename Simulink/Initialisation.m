@@ -97,8 +97,8 @@ den_bille_simu = [7*L 0];
 
 %% Rlocus pour boucle interne
 % Graphique
-% figure
-% rlocus(num_mot,den_mot)
+figure
+rlocus(num_mot,den_mot, "blue")
 
 %Trouver automatiquement le gain
 [~,p,~]=residue(num_mot,den_mot);
@@ -267,47 +267,6 @@ Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "10");
 % Max_CD_Bode= max(rad2deg(Sim_Asservi2.Theta_Cd.Data))
 % Max_V_Bode = max(Sim_Asservi2.Vm_out.Data)
 
-F1 = figure;
-F2 = figure;
-F3 = figure;
-F4 = figure;
-
-%subplot(4,1,1)
-figure(F1);
-hold on
-plot(Sim_Asservi1.Vm_out)
-plot(Sim_Asservi2.Vm_out)
-%title("V_m")
-%legend(["Bi Linéaire", "Bode Linéaire"])
-%ylabel("Tension (V)")
-
-%subplot(4,1,2)
-figure(F2);
-hold on
-plot(Sim_Asservi1.X)
-plot(Sim_Asservi2.X)
-%title("X")
-%legend(["Bi Linéaire", "Bode Linéaire"])
-%ylabel("Position (m)")
-
-%subplot(4,1,3)
-figure(F3);
-hold on
-plot(Sim_Asservi1.Theta_C.Time, rad2deg(Sim_Asservi1.Theta_C.Data))
-plot(Sim_Asservi2.Theta_C.Time, rad2deg(Sim_Asservi2.Theta_C.Data))
-%title("\Theta_C")
-%legend(["Bi Linéaire", "Bode Linéaire"])
-%ylabel("Angle (deg)")
-
-%subplot(4,1,4)
-figure(F4);
-hold on
-plot(Sim_Asservi1.Theta_Cd.Time, rad2deg(Sim_Asservi1.Theta_Cd.Data))
-plot(Sim_Asservi2.Theta_Cd.Time, rad2deg(Sim_Asservi2.Theta_Cd.Data))
-%title("\Theta_C_d")
-%legend(["Bi Linéaire", "Bode Linéaire"])
-%ylabel("Angle (deg)")
-
 %% Validation sur modèle non-linéraire
 X_num = TF_PD_Bi_Num;
 X_den = TF_PD_Bi_Den;
@@ -317,44 +276,85 @@ X_num = TF_PD_Bode_Num;
 X_den = TF_PD_Bode_Den;
 Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", "10");
 
-%subplot(4,1,1)
-figure(F1);
-hold on
-plot(Sim_Non_Lin_Asservi1.Vm_out)
-plot(Sim_Non_Lin_Asservi2.Vm_out)
-title("V_m")
-%legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
-legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
-ylabel("Tension (V)")
-
-%subplot(4,1,2)
-figure(F2);
-hold on
-plot(Sim_Non_Lin_Asservi1.X)
-plot(Sim_Non_Lin_Asservi2.X)
-title("X")
-%legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
-legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
-ylabel("Position (m)")
-
-%subplot(4,1,3)
-figure(F3);
-hold on
-plot(Sim_Non_Lin_Asservi1.Theta_C.Time, rad2deg(Sim_Non_Lin_Asservi1.Theta_C.Data))
-plot(Sim_Non_Lin_Asservi2.Theta_C.Time, rad2deg(Sim_Non_Lin_Asservi2.Theta_C.Data))
-title("\Theta_C")
-%legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
-legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
-ylabel("Angle (deg)")
-
-%subplot(4,1,4)
-figure(F4);
-hold on
-plot(Sim_Non_Lin_Asservi1.Theta_Cd.Time, rad2deg(Sim_Non_Lin_Asservi1.Theta_Cd.Data))
-plot(Sim_Non_Lin_Asservi2.Theta_Cd.Time, rad2deg(Sim_Non_Lin_Asservi2.Theta_Cd.Data))
-title("\Theta_C_d")
-%legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
-legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
-ylabel("Angle (deg)")
+            % F1 = figure;
+            % F2 = figure;
+            % F3 = figure;
+            % F4 = figure;
+            % 
+            % %subplot(4,1,1)
+            % figure(F1);
+            % hold on
+            % plot(Sim_Asservi1.Vm_out)
+            % plot(Sim_Asservi2.Vm_out)
+            % %title("V_m")
+            % %legend(["Bi Linéaire", "Bode Linéaire"])
+            % %ylabel("Tension (V)")
+            % 
+            % %subplot(4,1,2)
+            % figure(F2);
+            % hold on
+            % plot(Sim_Asservi1.X)
+            % plot(Sim_Asservi2.X)
+            % %title("X")
+            % %legend(["Bi Linéaire", "Bode Linéaire"])
+            % %ylabel("Position (m)")
+            % 
+            % %subplot(4,1,3)
+            % figure(F3);
+            % hold on
+            % plot(Sim_Asservi1.Theta_C.Time, rad2deg(Sim_Asservi1.Theta_C.Data))
+            % plot(Sim_Asservi2.Theta_C.Time, rad2deg(Sim_Asservi2.Theta_C.Data))
+            % %title("\Theta_C")
+            % %legend(["Bi Linéaire", "Bode Linéaire"])
+            % %ylabel("Angle (deg)")
+            % 
+            % %subplot(4,1,4)
+            % figure(F4);
+            % hold on
+            % plot(Sim_Asservi1.Theta_Cd.Time, rad2deg(Sim_Asservi1.Theta_Cd.Data))
+            % plot(Sim_Asservi2.Theta_Cd.Time, rad2deg(Sim_Asservi2.Theta_Cd.Data))
+            % %title("\Theta_C_d")
+            % %legend(["Bi Linéaire", "Bode Linéaire"])
+            % %ylabel("Angle (deg)")
+            % 
+            % %subplot(4,1,1)
+            % figure(F1);
+            % hold on
+            % plot(Sim_Non_Lin_Asservi1.Vm_out)
+            % plot(Sim_Non_Lin_Asservi2.Vm_out)
+            % title("V_m")
+            % %legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
+            % legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
+            % ylabel("Tension (V)")
+            % 
+            % %subplot(4,1,2)
+            % figure(F2);
+            % hold on
+            % plot(Sim_Non_Lin_Asservi1.X)
+            % plot(Sim_Non_Lin_Asservi2.X)
+            % title("X")
+            % %legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
+            % legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
+            % ylabel("Position (m)")
+            % 
+            % %subplot(4,1,3)
+            % figure(F3);
+            % hold on
+            % plot(Sim_Non_Lin_Asservi1.Theta_C.Time, rad2deg(Sim_Non_Lin_Asservi1.Theta_C.Data))
+            % plot(Sim_Non_Lin_Asservi2.Theta_C.Time, rad2deg(Sim_Non_Lin_Asservi2.Theta_C.Data))
+            % title("\Theta_C")
+            % %legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
+            % legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
+            % ylabel("Angle (deg)")
+            % 
+            % %subplot(4,1,4)
+            % figure(F4);
+            % hold on
+            % plot(Sim_Non_Lin_Asservi1.Theta_Cd.Time, rad2deg(Sim_Non_Lin_Asservi1.Theta_Cd.Data))
+            % plot(Sim_Non_Lin_Asservi2.Theta_Cd.Time, rad2deg(Sim_Non_Lin_Asservi2.Theta_Cd.Data))
+            % title("\Theta_C_d")
+            % %legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
+            % legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
+            % ylabel("Angle (deg)")
 
 disp("Hello World")
