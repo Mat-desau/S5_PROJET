@@ -172,6 +172,10 @@ B_int(4,1) = K_int*B(4,1);
 % figure
 % margin(K_int*TF_mot)
 
+%Rlocus (SI-10)
+% figure
+% rlocus(FTBF_TF_int_ordre4, "blue")
+
 %% Boucle Externe
 %Variables
 M_p = 5; % Important ceci est en pourcent
@@ -219,11 +223,11 @@ TF_FTBO_ext_Bi = TF_FTBO_ext_Bi * K_a;
 TF_FTBF_ext_Bi = feedback(TF_FTBO_ext_Bi, 1);
 
 %Validation par margin  (GM > 10 et PM > 45deg)
-% figure 
-% margin(TF_FTBO_ext_Bi)
+figure 
+margin(TF_FTBO_ext_Bi)
 
 %Validation par step info  (Mp = 30% +- 0.1 et t_s = 5 +- 0.1)
-% stepinfo(TF_FTBF_ext_Bi)
+stepinfo(TF_FTBF_ext_Bi)
 
 %Validation par Simulink
 %Valider Omega_CD (+- 56°)
@@ -277,7 +281,8 @@ TF_FTBF_ext_Bode = feedback(TF_FTBO_ext_Bode, 1);
 % BW_Cal = bandwidth(TF_FTBF_ext_Bode)
 
 % Validation de StepInfo (t_s = 4.5 +- 0.05 sec)
-%stepinfo(TF_FTBF_ext_Bode)
+% step(TF_FTBF_ext_Bode)
+% stepinfo(TF_FTBF_ext_Bode)
 
 clear Alpha K_a Zeta Delta_phi PM K_etoile Omega_g_etoile
 
@@ -293,10 +298,10 @@ Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "10");
 
 
 %Trouver les Max pour les validation par Simulink
-% Max_CD_Bi= max(rad2deg(Sim_Asservi1.Theta_Cd.Data))
-% Max_V_Bi = max(Sim_Asservi1.Vm_out.Data)
-% Max_CD_Bode= max(rad2deg(Sim_Asservi2.Theta_Cd.Data))
-% Max_V_Bode = max(Sim_Asservi2.Vm_out.Data)
+Max_CD_Bi= max(rad2deg(Sim_Asservi1.Theta_Cd.Data))
+Max_V_Bi = max(Sim_Asservi1.Vm_out.Data)
+Max_CD_Bode= max(rad2deg(Sim_Asservi2.Theta_Cd.Data))
+Max_V_Bode = max(Sim_Asservi2.Vm_out.Data)
 
 %% Validation sur modèle non-linéraire
 X_num = TF_PD_Bi_Num;
@@ -308,6 +313,47 @@ X_num = TF_PD_Bode_Num;
 X_den = TF_PD_Bode_Den;
 %Ouvrir Simulink
 Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", "10");
+
+%Position résultat (SE-4)
+% figure
+% hold on
+% plot(Sim_Non_Lin_Asservi1.X.Time, Sim_Non_Lin_Asservi1.X.Data, "red");
+% Valeur_Demander = (Test_Position*ones(length(Sim_Non_Lin_Asservi1.X.Time),1));
+% plot(Sim_Non_Lin_Asservi1.X.Time, Valeur_Demander, "blue");
+% % t_p
+% [Max_Sorti_X, IndexMax] = max(Sim_Non_Lin_Asservi1.X.Data);
+% scatter(Sim_Non_Lin_Asservi1.X.Time(IndexMax), Sim_Non_Lin_Asservi1.X.Data(IndexMax), 100, "square", 'black');
+% tp = Sim_Non_Lin_Asservi1.X.Time(IndexMax)
+% Mp = Sim_Non_Lin_Asservi1.X.Data(IndexMax)
+% % t_s
+% temp = Sim_Non_Lin_Asservi1.X.Data(IndexMax:end) - (Test_Position+(Test_Position*0.02));
+% [~, index_ts] = min(abs(temp));
+% scatter(Sim_Non_Lin_Asservi1.X.Time(IndexMax+index_ts), Sim_Non_Lin_Asservi1.X.Data(IndexMax+index_ts), 100, "square", 'black');
+% ts = Sim_Non_Lin_Asservi1.X.Time(IndexMax+index_ts)
+% title("X Bisectrice")
+% legend(["Réponse", "Position Demander"])
+% ylabel("Position (m)")
+% clear Valeur_Demander Max_Sorti_X IndexMax index_ts
+% 
+% figure
+% hold on
+% plot(Sim_Non_Lin_Asservi2.X, "red");
+% Valeur_Demander = (Test_Position*ones(length(Sim_Non_Lin_Asservi2.X.Time),1));
+% plot(Sim_Non_Lin_Asservi2.X.Time, Valeur_Demander, "blue");
+% % t_p
+% [Max_Sorti_X, IndexMax] = max(Sim_Non_Lin_Asservi2.X.Data);
+% scatter(Sim_Non_Lin_Asservi2.X.Time(IndexMax), Sim_Non_Lin_Asservi2.X.Data(IndexMax), 100, "square", 'black');
+% tp = Sim_Non_Lin_Asservi2.X.Time(IndexMax)
+% Mp = Sim_Non_Lin_Asservi2.X.Data(IndexMax)
+% % t_s
+% temp = Sim_Non_Lin_Asservi2.X.Data(IndexMax:end) - (Test_Position+(Test_Position*0.02));
+% [~, index_ts] = min(abs(temp));
+% scatter(Sim_Non_Lin_Asservi2.X.Time(IndexMax+index_ts), Sim_Non_Lin_Asservi2.X.Data(IndexMax+index_ts), 100, "square", 'black');
+% ts = Sim_Non_Lin_Asservi2.X.Time(IndexMax+index_ts)
+% title("X Bode")
+% legend(["Réponse", "Position Demander"])
+% ylabel("Position (m)")
+% clear Valeur_Demander Max_Sorti_X IndexMax index_ts
 
             % F1 = figure;
             % F2 = figure;
