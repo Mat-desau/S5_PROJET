@@ -142,25 +142,22 @@ Test_Position = 0.06; % m
 FTBF_TF_mot = feedback(K_int*TF_mot, 1);
 FTBF_TF_int_ordre4 = FTBF_TF_mot * TF_bille;
 
-temp1 = 
+%Creation des nouvelles matrices interne
+A_int = A;
+B_int = B;
+C_int = C;
+D_int = D;
 
-A_int = [0 1   0    0;
-         0 0 temp1  0;
-         0 0   0    1;
-         0 0   0  temp2];
+%Ajouter les modifications
+A_int(4,3) = (-1)*(B(4,1))*K_int;
+B_int(4,1) = K_int*B(4,1);
 
-B_int = [  0;
-           0;
-           0;
-         temp3];
-
-C_int = [1 0 0 0;
-         0 0 1 0];
-
-D_int = [0;
-         0];
-
-clear temp1 temp2 temp3
+%Valeurs propre SI-7
+% eig(A_int)
+% A_int
+% B_int
+% C_int
+% D_int
 
 %Graphique (SI-4)
 % figure
@@ -257,9 +254,10 @@ FTBO_TF_ext = FTBF_TF_int_ordre4;
 
 %Calculs
 Zeta = (1/2)*sqrt(tand(PM_etoile)*sind(PM_etoile));
-Omega_g_etoile = BW * ((sqrt(sqrt(1+(4*(Zeta^4)))-(2*(Zeta^2)))) / (sqrt((1-(2*Zeta^2))+sqrt((4*Zeta^4)-(4*Zeta^2)+2))))
+Omega_g_etoile = BW * ((sqrt(sqrt(1+(4*(Zeta^4)))-(2*(Zeta^2)))) / (sqrt((1-(2*Zeta^2))+sqrt((4*Zeta^4)-(4*Zeta^2)+2))));
 K_etoile = 1 / abs(evalfr(FTBO_TF_ext, (Omega_g_etoile*i)));
 PM = angle(evalfr(FTBO_TF_ext*K_etoile, (Omega_g_etoile*i))) - pi;
+PM2 = rad2deg(PM);
 Delta_phi = deg2rad(PM_etoile) - PM;
 Alpha = (1 - sin(Delta_phi)) / (1 + sin(Delta_phi));
 T = 1 / (Omega_g_etoile * sqrt(Alpha));
