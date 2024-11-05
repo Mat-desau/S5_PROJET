@@ -137,6 +137,11 @@ Sim_Non_Lin = sim('Modele_Non_Lineaire.slx');
 Test_Angle = pi/4;
 Test_Position = 0.06; % m
 
+% Ajustement des valeurs
+%Ajout_Omega_a = 0.383425; % en rad (essai erreur pour trouver 30 direct)
+Ajout_Omega_a = 0.4;
+Ajout_P_Etoile = 0.025;
+
 %Fermer la boucle (theta_c/V_m) avec K_int
 FTBF_TF_mot = feedback(K_int*TF_mot, 1);
 FTBF_TF_int_ordre4 = FTBF_TF_mot * TF_bille;
@@ -151,12 +156,12 @@ t_p = 3; % sec
 %Calculs par bisectrice
 Phi = atan((-pi) / log(M_p/100));
 Zeta = cos(Phi);
-Omega_a = pi / t_p;
+Omega_a = (pi / t_p) - Ajout_Omega_a;
     % Omega_n = Omega_a / sqrt(1-Zeta^2)
     % Omega_n = (1+(1.1*Zeta)+(1.4*Zeta^2)) / t_r
 Omega_n = 4 / (Zeta*t_s); % On prends celle-ci car elle a Omega_n le plus haut
 
-P_etoile = (((-1)*Omega_n*Zeta) + Omega_a*i);
+P_etoile = ((((-1)*Omega_n*Zeta)+Ajout_P_Etoile) + Omega_a*i);
 
 %Trouver notre angle pour P_etoile
 frsp = evalfr(FTBF_TF_int_ordre4, P_etoile);
@@ -175,7 +180,7 @@ P_temp = real(P_etoile) - (imag(P_etoile) / tan(Phi_p));
 %Pour faire l'étape finale
 TF_PD_Bi = tf([1 -Z_temp], [1 -P_temp]);
 TF_FTBO_ext_Bi = TF_PD_Bi * FTBF_TF_int_ordre4;
-K_a = 1 / abs(evalfr(TF_FTBO_ext_Bi, P_etoile))
+K_a = 1 / abs(evalfr(TF_FTBO_ext_Bi, P_etoile));
 
 %Creation des nouvelles TF
 TF_PD_Bi = TF_PD_Bi * K_a;
@@ -183,21 +188,24 @@ TF_PD_Bi = TF_PD_Bi * K_a;
 TF_FTBO_ext_Bi = TF_FTBO_ext_Bi * K_a;
 TF_FTBF_ext_Bi = feedback(TF_FTBO_ext_Bi, 1);
 
-        % figure
-        % step(TF_FTBF_ext_Bi)
-        stepinfo(TF_FTBF_ext_Bi)
-        % 
+% Validation par margin  (GM > 10 et PM > 45deg)
+% figure 
+% margin(TF_FTBO_ext_Bi)
+
+% Validation par step info  (Mp = 30% +- 0.1 et t_s = 5 +- 0.1)
+% stepinfo(TF_FTBF_ext_Bi)
+        
+        % Afficher le Rlocus avec les points
         % figure
         % hold on
         % rlocus(TF_FTBO_ext_Bi, 'red');
         % scatter(real(P_etoile),imag(P_etoile), '^', "blue");
         % scatter(real(P_etoile),imag(-P_etoile), '^', "blue");
 
-        % figure 
-        % pzmap(TF_FTBF_ext_Bi)
-
 %Enlever non-utiliser
 clear Z_temp P_temp Phi_z Phi_p Alpha K_a Zeta Delta_phi Angle_FTBF_TF_int Omega_n Omega_a Phi P_etoile
+
+
 
 % Calcul par Bode 
 % Variables
@@ -242,6 +250,8 @@ X_den = TF_PD_Bode_Den;
 % Ouvrir Simulink
 Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx');
 
+Max_CD= max(rad2deg(Sim_Asservi1.Theta_Cd.Data))
+Max_V = max(Sim_Asservi1.Vm_out.Data)
 
 % figure
 % sgtitle("Graphiques des asservissements")
