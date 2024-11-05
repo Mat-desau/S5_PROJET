@@ -137,14 +137,10 @@ Sim_Non_Lin = sim('Modele_Non_Lineaire.slx');
 Test_Angle = pi/4;
 Test_Position = 0.06; % m
 
-% Ajustement des valeurs
-%Ajout_Omega_a = 0.383425; % en rad (essai erreur pour trouver 30 direct)
-Ajout_Omega_a = 0.4;
-Ajout_P_Etoile = 0.025;
-
 %Fermer la boucle (theta_c/V_m) avec K_int
 FTBF_TF_mot = feedback(K_int*TF_mot, 1);
 FTBF_TF_int_ordre4 = FTBF_TF_mot * TF_bille;
+
 
 % Boucle Externe
 %Variables
@@ -152,6 +148,10 @@ M_p = 5; % Important ceci est en pourcent
 t_s = 4; % sec
 t_r = 2; % sec
 t_p = 3; % sec
+
+% Ajustement des valeurs pour Bisectrice
+Ajout_Omega_a = 0.4;
+Ajout_P_Etoile = 0.025;
 
 %Calculs par bisectrice
 Phi = atan((-pi) / log(M_p/100));
@@ -161,12 +161,12 @@ Omega_a = (pi / t_p) - Ajout_Omega_a;
     % Omega_n = (1+(1.1*Zeta)+(1.4*Zeta^2)) / t_r
 Omega_n = 4 / (Zeta*t_s); % On prends celle-ci car elle a Omega_n le plus haut
 
+% Calcul du des P étoiles pour les poles à faire passer la nouvelle fonction
 P_etoile = ((((-1)*Omega_n*Zeta)+Ajout_P_Etoile) + Omega_a*i);
 
 %Trouver notre angle pour P_etoile
 frsp = evalfr(FTBF_TF_int_ordre4, P_etoile);
 Angle_FTBF_TF_int = rad2deg(angle(frsp)) - 360;
-% Mag_FTBF_TF_int = abs(frsp);
 clear frsp 
 
 %Calcul de l'avance de phase comme dans le document
@@ -177,7 +177,7 @@ Phi_p = ((Alpha - Delta_phi) / 2);
 Z_temp = real(P_etoile) - (imag(P_etoile) / tan(Phi_z));
 P_temp = real(P_etoile) - (imag(P_etoile) / tan(Phi_p));
 
-%Pour faire l'étape finale
+% Pour trouver le K_a
 TF_PD_Bi = tf([1 -Z_temp], [1 -P_temp]);
 TF_FTBO_ext_Bi = TF_PD_Bi * FTBF_TF_int_ordre4;
 K_a = 1 / abs(evalfr(TF_FTBO_ext_Bi, P_etoile));
@@ -194,21 +194,20 @@ TF_FTBF_ext_Bi = feedback(TF_FTBO_ext_Bi, 1);
 
 % Validation par step info  (Mp = 30% +- 0.1 et t_s = 5 +- 0.1)
 % stepinfo(TF_FTBF_ext_Bi)
+
+% Validation par Simulink
+% Valider Omega_CD (+- 56°)
+% Valider Vm (+- 10)
         
-        % Afficher le Rlocus avec les 
+        % Afficher le Rlocus avec les points
         % figure
         % hold on
         % rlocus(TF_FTBO_ext_Bi, 'red');
         % scatter(real(P_etoile),imag(P_etoile), '^', "blue");
         % scatter(real(P_etoile),imag(-P_etoile), '^', "blue");
-        % 
-        % figure 
-        % pzmap(TF_FTBF_ext_Bi)
 
 %Enlever non-utiliser
-clear Z_temp P_temp Phi_z Phi_p Alpha K_a Zeta Delta_phi Angle_FTBF_TF_int Omega_n Omega_a Phi P_etoile
-
-
+clear Z_temp P_temp Phi_z Phi_p Alpha K_a Zeta Delta_phi Angle_FTBF_TF_int Omega_n Omega_a Phi P_etoile Ajout_P_Etoile Ajout_Omega_a
 
 % Calcul par Bode 
 % Variables
@@ -216,32 +215,37 @@ PM_etoile = 45; % deg
 BW = 2.3; % rad/s
 Echelon_Saturation = 6; % cm
 
+% La nouvelle boucle fermer ordre 4 devient la FTBO externe
 FTBO_TF_ext = FTBF_TF_int_ordre4;
 
-% Début des calculs
+% Calculs
 Zeta = (1/2)*sqrt(tand(PM_etoile)*sind(PM_etoile));
 Omega_g_etoile = BW * ((sqrt(sqrt(1+(4*(Zeta^4)))-(2*(Zeta^2)))) / (sqrt((1-(2*Zeta^2))+sqrt((4*Zeta^4)-(4*Zeta^2)+2))));
-K_etoile = 1 / abs(evalfr(FTBO_TF_ext, (Omega_g_etoile*i)));
-% [GM_temp, PM_temp, Omega_p_temp, Omega_g_temp] = margin(FTBO_TF_ext*K_etoile)
+K_etoile = 1 / abs(evalfr(FTBO_TF_ext, (Omega_g_etoile*i)))
+K_etoile = 7
 PM = angle(evalfr(FTBO_TF_ext*K_etoile, (Omega_g_etoile*i))) - pi;
 Delta_phi = deg2rad(PM_etoile) - PM;
 Alpha = (1 - sin(Delta_phi)) / (1 + sin(Delta_phi));
 T = 1 / (Omega_g_etoile * sqrt(Alpha));
 K_a = K_etoile / sqrt(Alpha);
 
-% Fonction de transfert
+% Création des fonctions de transfert
 TF_PD_Bode = tf([K_a*Alpha*T K_a*Alpha], [Alpha*T 1]);
 [TF_PD_Bode_Num, TF_PD_Bode_Den]  = tfdata(TF_PD_Bode, 'v');
 TF_FTBO_ext_Bode = TF_PD_Bode * FTBO_TF_ext;
 TF_FTBF_ext_Bode = feedback(TF_FTBO_ext_Bode, 1);
 
-        % figure
-        % step(TF_FTBF_ext_Bode)
-        % stepinfo(TF_FTBF_ext_Bode)
-        % 
-        % figure
-        % hold on
-        % margin(TF_FTBO_ext_Bode);
+% Validation margin(GM = 12 +- 1 dB et PM = 45 +- 0.1 deg) 
+figure;
+margin(TF_FTBO_ext_Bode);
+
+% Validation Bandwidth (BW > 2.5)
+BW_Cal = bandwidth(TF_FTBF_ext_Bode)
+
+% Validation de StepInfo (t_s = 4.5 +- 0.05 sec)
+stepinfo(TF_FTBF_ext_Bode)
+
+clear Alpha K_a Zeta Delta_phi PM K_etoile Omega_g_etoile
 
 X_num = TF_PD_Bi_Num;
 X_den = TF_PD_Bi_Den;
@@ -253,8 +257,8 @@ X_den = TF_PD_Bode_Den;
 % Ouvrir Simulink
 Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx');
 
-Max_CD= max(rad2deg(Sim_Asservi1.Theta_Cd.Data))
-Max_V = max(Sim_Asservi1.Vm_out.Data)
+% Max_CD= max(rad2deg(Sim_Asservi1.Theta_Cd.Data))
+% Max_V = max(Sim_Asservi1.Vm_out.Data)
 
 % figure
 % sgtitle("Graphiques des asservissements")
