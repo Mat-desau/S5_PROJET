@@ -280,7 +280,8 @@ TF_FTBF_ext_Bode = feedback(TF_FTBO_ext_Bode, 1);
 %Validation Bandwidth (BW > 2.5)
 % BW_Cal = bandwidth(TF_FTBF_ext_Bode)
 
-% Validation de StepInfo (t_s = 4.5 +- 0.05 sec)
+%Validation de StepInfo (t_s = 4.5 +- 0.05 sec)
+% figure
 % step(TF_FTBF_ext_Bode)
 % stepinfo(TF_FTBF_ext_Bode)
 
@@ -295,7 +296,6 @@ X_num = TF_PD_Bode_Num;
 X_den = TF_PD_Bode_Den;
 %Ouvrir Simulink
 Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "10");
-
 
 %Trouver les Max pour les validation par Simulink
 % Max_CD_Bi= max(rad2deg(Sim_Asservi1.Theta_Cd.Data))
