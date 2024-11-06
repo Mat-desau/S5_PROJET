@@ -281,9 +281,9 @@ TF_FTBF_ext_Bode = feedback(TF_FTBO_ext_Bode, 1);
 % BW_Cal = bandwidth(TF_FTBF_ext_Bode)
 
 %Validation de StepInfo (t_s = 4.5 +- 0.05 sec)
-% figure
-% step(TF_FTBF_ext_Bode)
-% stepinfo(TF_FTBF_ext_Bode)
+figure
+step(TF_FTBF_ext_Bode)
+stepinfo(TF_FTBF_ext_Bode)
 
 clear Alpha K_a Zeta Delta_phi PM K_etoile Omega_g_etoile
 
@@ -355,85 +355,85 @@ Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", "10");
 % ylabel("Position (m)")
 % clear Valeur_Demander Max_Sorti_X IndexMax index_ts
 
-            F1 = figure;
-            F2 = figure;
-            F3 = figure;
-            F4 = figure;
-
-            %subplot(4,1,1)
-            figure(F1);
-            hold on
-            plot(Sim_Asservi1.Vm_out)
-            plot(Sim_Asservi2.Vm_out)
-            %title("V_m")
-            %legend(["Bi Linéaire", "Bode Linéaire"])
-            %ylabel("Tension (V)")
-
-            %subplot(4,1,2)
-            figure(F2);
-            hold on
-            plot(Sim_Asservi1.X)
-            plot(Sim_Asservi2.X)
-            %title("X")
-            %legend(["Bi Linéaire", "Bode Linéaire"])
-            %ylabel("Position (m)")
-
-            %subplot(4,1,3)
-            figure(F3);
-            hold on
-            plot(Sim_Asservi1.Theta_C.Time, rad2deg(Sim_Asservi1.Theta_C.Data))
-            plot(Sim_Asservi2.Theta_C.Time, rad2deg(Sim_Asservi2.Theta_C.Data))
-            %title("\Theta_C")
-            %legend(["Bi Linéaire", "Bode Linéaire"])
-            %ylabel("Angle (deg)")
-
-            %subplot(4,1,4)
-            figure(F4);
-            hold on
-            plot(Sim_Asservi1.Theta_Cd.Time, rad2deg(Sim_Asservi1.Theta_Cd.Data))
-            plot(Sim_Asservi2.Theta_Cd.Time, rad2deg(Sim_Asservi2.Theta_Cd.Data))
-            %title("\Theta_C_d")
-            %legend(["Bi Linéaire", "Bode Linéaire"])
-            %ylabel("Angle (deg)")
-
-            %subplot(4,1,1)
-            figure(F1);
-            hold on
-            plot(Sim_Non_Lin_Asservi1.Vm_out)
-            plot(Sim_Non_Lin_Asservi2.Vm_out)
-            title("V_m")
-            %legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
-            legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
-            ylabel("Tension (V)")
-
-            %subplot(4,1,2)
-            figure(F2);
-            hold on
-            plot(Sim_Non_Lin_Asservi1.X)
-            plot(Sim_Non_Lin_Asservi2.X)
-            title("X")
-            %legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
-            legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
-            ylabel("Position (m)")
-
-            %subplot(4,1,3)
-            figure(F3);
-            hold on
-            plot(Sim_Non_Lin_Asservi1.Theta_C.Time, rad2deg(Sim_Non_Lin_Asservi1.Theta_C.Data))
-            plot(Sim_Non_Lin_Asservi2.Theta_C.Time, rad2deg(Sim_Non_Lin_Asservi2.Theta_C.Data))
-            title("\Theta_C")
-            %legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
-            legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
-            ylabel("Angle (deg)")
-
-            %subplot(4,1,4)
-            figure(F4);
-            hold on
-            plot(Sim_Non_Lin_Asservi1.Theta_Cd.Time, rad2deg(Sim_Non_Lin_Asservi1.Theta_Cd.Data))
-            plot(Sim_Non_Lin_Asservi2.Theta_Cd.Time, rad2deg(Sim_Non_Lin_Asservi2.Theta_Cd.Data))
-            title("\Theta_C_d")
-            %legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
-            legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
-            ylabel("Angle (deg)")
+            % F1 = figure;
+            % F2 = figure;
+            % F3 = figure;
+            % F4 = figure;
+            % 
+            % %subplot(4,1,1)
+            % figure(F1);
+            % hold on
+            % plot(Sim_Asservi1.Vm_out)
+            % plot(Sim_Asservi2.Vm_out)
+            % %title("V_m")
+            % %legend(["Bi Linéaire", "Bode Linéaire"])
+            % %ylabel("Tension (V)")
+            % 
+            % %subplot(4,1,2)
+            % figure(F2);
+            % hold on
+            % plot(Sim_Asservi1.X)
+            % plot(Sim_Asservi2.X)
+            % %title("X")
+            % %legend(["Bi Linéaire", "Bode Linéaire"])
+            % %ylabel("Position (m)")
+            % 
+            % %subplot(4,1,3)
+            % figure(F3);
+            % hold on
+            % plot(Sim_Asservi1.Theta_C.Time, rad2deg(Sim_Asservi1.Theta_C.Data))
+            % plot(Sim_Asservi2.Theta_C.Time, rad2deg(Sim_Asservi2.Theta_C.Data))
+            % %title("\Theta_C")
+            % %legend(["Bi Linéaire", "Bode Linéaire"])
+            % %ylabel("Angle (deg)")
+            % 
+            % %subplot(4,1,4)
+            % figure(F4);
+            % hold on
+            % plot(Sim_Asservi1.Theta_Cd.Time, rad2deg(Sim_Asservi1.Theta_Cd.Data))
+            % plot(Sim_Asservi2.Theta_Cd.Time, rad2deg(Sim_Asservi2.Theta_Cd.Data))
+            % %title("\Theta_C_d")
+            % %legend(["Bi Linéaire", "Bode Linéaire"])
+            % %ylabel("Angle (deg)")
+            % 
+            % %subplot(4,1,1)
+            % figure(F1);
+            % hold on
+            % plot(Sim_Non_Lin_Asservi1.Vm_out)
+            % plot(Sim_Non_Lin_Asservi2.Vm_out)
+            % title("V_m")
+            % %legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
+            % legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
+            % ylabel("Tension (V)")
+            % 
+            % %subplot(4,1,2)
+            % figure(F2);
+            % hold on
+            % plot(Sim_Non_Lin_Asservi1.X)
+            % plot(Sim_Non_Lin_Asservi2.X)
+            % title("X")
+            % %legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
+            % legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
+            % ylabel("Position (m)")
+            % 
+            % %subplot(4,1,3)
+            % figure(F3);
+            % hold on
+            % plot(Sim_Non_Lin_Asservi1.Theta_C.Time, rad2deg(Sim_Non_Lin_Asservi1.Theta_C.Data))
+            % plot(Sim_Non_Lin_Asservi2.Theta_C.Time, rad2deg(Sim_Non_Lin_Asservi2.Theta_C.Data))
+            % title("\Theta_C")
+            % %legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
+            % legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
+            % ylabel("Angle (deg)")
+            % 
+            % %subplot(4,1,4)
+            % figure(F4);
+            % hold on
+            % plot(Sim_Non_Lin_Asservi1.Theta_Cd.Time, rad2deg(Sim_Non_Lin_Asservi1.Theta_Cd.Data))
+            % plot(Sim_Non_Lin_Asservi2.Theta_Cd.Time, rad2deg(Sim_Non_Lin_Asservi2.Theta_Cd.Data))
+            % title("\Theta_C_d")
+            % %legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
+            % legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
+            % ylabel("Angle (deg)")
 
 disp("Hello World")
