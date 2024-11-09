@@ -19,7 +19,7 @@ omega_c = deg2rad(omega_c);
 % Omega_c = polyval(P, tsimu(1:end-1));
 
 Min = 101;
-Max = 107;
+Max = 104;
 
 A = mean(omega_c(Max:end));
 % A = 1.6107; % Celui à Mathis
@@ -36,14 +36,14 @@ Omega_c = (A)./(1+(exp((-b)*(tsimu(1:end-1)-(c)))));
 % Omega_c = (P.a)./(1+(exp((-P.b)*(tsimu(1:end-1)-(P.c)))));
 
 % Plot pour montrer du lissage vs pas lisser
-% figure
-% hold on
-% plot(tsimu(1:end-1), Omega_c, 'black')
-% plot(tsimu(1:end-1), omega_c, 'red')
-% title("Méthode de lissage");
-% xlabel("Temps (s)");
-% ylabel("Vitesse (rad/s)");
-% legend(["Lisser", "Non-Lisser"]);
+figure
+hold on
+plot(tsimu(1:end-1), Omega_c, 'black')
+plot(tsimu(1:end-1), omega_c, 'red')
+title("Méthode de lissage");
+xlabel("Temps (s)");
+ylabel("Vitesse (rad/s)");
+legend(["Lisser", "Non-Lisser"]);
 
 %% Calcul des coefficient Fonction de transfert
 dT = tsimu(2);
@@ -97,24 +97,15 @@ y = lsim(sys,Vm(1:end-1),tsimu(1:end-1));
 %% Erreur
 % RMSE
 RMSE = sqrt((1/length(omega_c))*(sum((y-omega_c).^2)))
+
 % R^2
 Y_ = (1/length(omega_c))*sum(omega_c);
-R_2 = sum((y-Y_).^2)/(sum((omega_c-Y_).^2))
+R_2 = sum((y(Min:Max)-Y_).^2)/(sum((omega_c(Min:Max)-Y_).^2))
 
 %% Save les valeurs 
 Path = which("Identification.m");
 Path = strrep(Path, 'Identification.m', 'Valeurs.mat');
 save(Path, "-mat");
 
-
-
-
-
-
-
-
-
-
-
-
-
+%Assurer la fin du document
+disp("Hello World")
