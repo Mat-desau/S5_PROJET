@@ -36,14 +36,14 @@ Omega_c = (A)./(1+(exp((-b)*(tsimu(1:end-1)-(c)))));
 % Omega_c = (P.a)./(1+(exp((-P.b)*(tsimu(1:end-1)-(P.c)))));
 
 % Plot pour montrer du lissage vs pas lisser
-figure
-hold on
-plot(tsimu(1:end-1), Omega_c, 'black')
-plot(tsimu(1:end-1), omega_c, 'red')
-title("Méthode de lissage");
-xlabel("Temps (s)");
-ylabel("Vitesse (rad/s)");
-legend(["Lisser", "Non-Lisser"]);
+% figure
+% hold on
+% plot(tsimu(1:end-1), Omega_c, 'black')
+% plot(tsimu(1:end-1), omega_c, 'red')
+% title("Méthode de lissage");
+% xlabel("Temps (s)");
+% ylabel("Vitesse (rad/s)");
+% legend(["Lisser", "Non-Lisser"]);
 
 %% Calcul des coefficient Fonction de transfert
 dT = tsimu(2);
@@ -83,6 +83,7 @@ B_eq = ((K_g*n_g*n_m*k_t)/(A_iden(1)*R_m))-((n_g*k_m*(K_g^2)*n_m*k_t)/R_m)
 sys = tf([A_iden(1)],[-1*A_iden(2) 1]);
 
 y = lsim(sys,Vm(1:end-1),tsimu(1:end-1));
+y_Rampe = lsim(sys,Vm(Min:Max),tsimu(Min:Max));
 
 % Graphiques
 % figure
@@ -100,7 +101,10 @@ RMSE = sqrt((1/length(omega_c))*(sum((y-omega_c).^2)))
 
 % R^2
 Y_ = (1/length(omega_c))*sum(omega_c);
-R_2 = sum((y(Min:Max)-Y_).^2)/(sum((omega_c(Min:Max)-Y_).^2))
+Y__Rampe = (1/length(omega_c(Min:Max)))*sum(omega_c(Min:Max));
+
+R_2_ALL = sum((y-Y_).^2)/(sum((omega_c-Y_).^2))
+R_2_Rampe = sum((y_Rampe-Y__Rampe).^2)/(sum((omega_c(Min:Max)-Y__Rampe).^2))
 
 %% Save les valeurs 
 Path = which("Identification.m");
