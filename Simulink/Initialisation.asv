@@ -265,7 +265,7 @@ PM2 = rad2deg(PM);
 Delta_phi = deg2rad(PM_etoile) - PM;
 Alpha = (1 - sin(Delta_phi)) / (1 + sin(Delta_phi));
 T = 1 / (Omega_g_etoile * sqrt(Alpha));
-K_a = K_etoile / sqrt(Alpha)
+K_a = K_etoile / sqrt(Alpha);
 
 %Création des fonctions de transfert
 TF_PD_Bode = tf([K_a*Alpha*T K_a*Alpha], [Alpha*T 1]);
@@ -290,6 +290,7 @@ clear Alpha K_a Zeta Delta_phi PM K_etoile Omega_g_etoile
 
 %% Simulink 
 K_int
+
 X_num = TF_PD_Bi_Num
 X_den = TF_PD_Bi_Den
 %Ouvrir Simulink
@@ -301,8 +302,8 @@ X_den = TF_PD_Bode_Den
 Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "10");
 
 %Trouver les Max pour les validation par Simulink
-% Max_CD_Bi= max(rad2deg(Sim_Asservi1.Theta_Cd.Data))
-% Max_V_Bi = max(Sim_Asservi1.Vm_out.Data)
+Max_CD_Bi= max(rad2deg(Sim_Asservi1.Theta_Cd.Data))
+Max_V_Bi = max(Sim_Asservi1.Vm_out.Data)
 % Max_CD_Bode= max(rad2deg(Sim_Asservi2.Theta_Cd.Data))
 % Max_V_Bode = max(Sim_Asservi2.Vm_out.Data)
 

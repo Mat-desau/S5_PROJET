@@ -19,7 +19,7 @@ omega_c = deg2rad(omega_c);
 % Omega_c = polyval(P, tsimu(1:end-1));
 
 Min = 101;
-Max = 104;
+Max = 104; %104
 
 A = mean(omega_c(Max:end));
 % A = 1.6107; % Celui à Mathis
@@ -35,7 +35,17 @@ Omega_c = (A)./(1+(exp((-b)*(tsimu(1:end-1)-(c)))));
 % P = fit(tsimu(1:end-1), omega_c, 'logistic')
 % Omega_c = (P.a)./(1+(exp((-P.b)*(tsimu(1:end-1)-(P.c)))));
 
-% Plot pour montrer du lissage vs pas lisser
+% Plot pour Montrer juste la monter
+% figure
+% hold on
+% plot(tsimu(Min:Max), Omega_c(Min:Max), 'black', 'Marker', 'o')
+% plot(tsimu(Min:Max), omega_c(Min:Max), 'red', 'Marker', 'x')
+% title("Méthode de lissage");
+% xlabel("Temps (s)");
+% ylabel("Vitesse (rad/s)");
+% legend(["Lisser", "Non-Lisser"]);
+
+% Plot pour toute
 % figure
 % hold on
 % plot(tsimu(1:end-1), Omega_c, 'black')
@@ -82,8 +92,8 @@ B_eq = ((K_g*n_g*n_m*k_t)/(A_iden(1)*R_m))-((n_g*k_m*(K_g^2)*n_m*k_t)/R_m)
 %% Graphique
 sys = tf([A_iden(1)],[-1*A_iden(2) 1]);
 
-y = lsim(sys,Vm(1:end-1),tsimu(1:end-1));
-y_Rampe = lsim(sys,Vm(Min:Max),tsimu(Min:Max));
+% y = lsim(sys,Vm(1:end-1),tsimu(1:end-1));
+% y_Rampe = lsim(sys,Vm(Min:Max),tsimu(Min:Max))
 
 % Graphiques
 % figure
@@ -96,15 +106,18 @@ y_Rampe = lsim(sys,Vm(Min:Max),tsimu(Min:Max));
 % legend(["Vrai données", "Fonction de transfert"]);
 
 %% Erreur
+%omega_c = signal dentrée bruité
+%y = la valeur qui est lisser
+
 % RMSE
-RMSE = sqrt((1/length(omega_c))*(sum((y-omega_c).^2)))
+RMSE = sqrt((1/length(omega_c))*(sum((Omega_c-omega_c).^2)))
 
 % R^2
-Y_ = (1/length(omega_c))*sum(omega_c);
-Y__Rampe = (1/length(omega_c(Min:Max)))*sum(omega_c(Min:Max));
+Y_ = (1/length(omega_c))*sum(omega_c)
+Y__Rampe = (1/length(omega_c(Min:Max)))*sum(omega_c(Min:Max))
 
-R_2_ALL = sum((y-Y_).^2)/(sum((omega_c-Y_).^2))
-R_2_Rampe = sum((y_Rampe-Y__Rampe).^2)/(sum((omega_c(Min:Max)-Y__Rampe).^2))
+R_2_ALL = sum((Omega_c-Y_).^2)/(sum((omega_c-Y_).^2))
+R_2_Rampe = sum((Omega_c(Min:Max)-Y__Rampe).^2)/(sum((omega_c(Min:Max)-Y__Rampe).^2))
 
 %% Save les valeurs 
 Path = which("Identification.m");
@@ -113,3 +126,11 @@ save(Path, "-mat");
 
 %Assurer la fin du document
 disp("Hello World")
+
+%Y_mesurer
+%Y_Estimer
+%R2 obtenu
+
+% Y_mesurer = omega_c(Min:Max)
+% Y_estimer = Omega_c(Min:Max)
+% R2_trouver = R_2_Rampe
