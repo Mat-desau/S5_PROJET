@@ -79,7 +79,7 @@ D = [0;
      0];
 
 %% Sortir les fonction de transfert
-%Fonction de base Theta_c/V_m
+%Fonction de base Theta_c/V_m (SI-1)
 num_mot = [K_g*n_m*n_g*k_t];
 den_mot = [R_m*J_eq  (R_m*B_eq+n_g*n_m*k_m*k_t*K_g.^2) 0];
 TF_mot = tf(num_mot, den_mot);
@@ -90,23 +90,23 @@ den_mot_simu = [R_m*J_eq  (R_m*B_eq+n_g*n_m*k_m*k_t*K_g.^2)];
 %Fonction de base X/theta_c
 num_bille = [5*g*r_arm];
 den_bille = [7*L 0 0];
-TF_bille = tf(num_bille, den_bille);
+TF_bille = tf(num_bille, den_bille)
 %Fonction de V_x/theta_C
 num_bille_simu = [5*g*r_arm];
 den_bille_simu = [7*L 0];
 
 %% Boucle interne trouver les K avec Rlocus
-%Trouver automatiquement le gain
+%Trouver automatiquement le gain (SI-3)
 [~,p,~]=residue(num_mot,den_mot);
 Intersection = sum(p)/(length(den_mot)-1);
 K_cri = (((-1)*den_mot(1)*(Intersection^2)) + ((-1)*den_mot(2)*(Intersection^1))) / (num_mot(1));
 
-%Trouver pour Zeta = 0.8
+%Trouver pour Zeta = 0.8 (SI-3)
 angle_Phi = acos(0.8);
 Imaginaire = Intersection*tan(angle_Phi);
 Inter = Intersection + Imaginaire*i;
 
-%Calcul de K_int
+%Calcul de K_int (SI-3)
 K_int = real((((-1)*den_mot(1)*(Inter^2)) + ((-1)*den_mot(2)*(Inter^1))) / (num_mot(1)));
 
 %Graphique (SC-3)
@@ -138,7 +138,7 @@ Sim_Non_Lin = sim('Modele_Non_Lineaire.slx', "StopTime", "10");
 Test_Angle = pi/4;
 Test_Position = 0.06; % m
 
-%Fermer la boucle (theta_c/V_m) avec K_int
+%Fermer la boucle (theta_c/V_m) avec K_int (SI-3)
 FTBF_TF_mot = feedback(K_int*TF_mot, 1);
 FTBF_TF_int_ordre4 = FTBF_TF_mot * TF_bille;
 
@@ -184,8 +184,8 @@ t_r = 2; % sec
 t_p = 3; % sec
 
 % Ajustement des valeurs pour Bisectrice
-Ajout_Omega_a = 0.4;
-Ajout_Omega_n = 0.025;
+Ajout_Omega_a = 0.4; %0.4
+Ajout_Omega_n = 0.025; %0.025
 
 %Calculs par bisectrice
 Phi = atan((-pi) / log(M_p/100));
@@ -214,7 +214,7 @@ P_temp = real(P_etoile) - (imag(P_etoile) / tan(Phi_p));
 %Pour trouver le K_a
 TF_PD_Bi = tf([1 -Z_temp], [1 -P_temp]);
 TF_FTBO_ext_Bi = TF_PD_Bi * FTBF_TF_int_ordre4;
-K_a = 1 / abs(evalfr(TF_FTBO_ext_Bi, P_etoile))
+K_a = 1 / abs(evalfr(TF_FTBO_ext_Bi, P_etoile));
 
 %Creation des nouvelles TF
 TF_PD_Bi = TF_PD_Bi * K_a;
@@ -245,8 +245,8 @@ clear Z_temp P_temp Phi_z Phi_p Alpha K_a Zeta Delta_phi Angle_FTBF_TF_int Omega
 
 %% Boucle Externe Bode
 %Ajustement
-Ajout_BW = 0.170;
-Ajout_PM = -0.1;
+Ajout_BW = 0.170; %0.170
+Ajout_PM = -0.1; %-0.1
 
 %Variables
 PM_etoile = 45 + Ajout_PM; % deg
@@ -282,28 +282,27 @@ TF_FTBF_ext_Bode = feedback(TF_FTBO_ext_Bode, 1);
 
 %Validation de StepInfo (t_s = 4.5 +- 0.05 sec)
 % figure
-% step(TF_FTBF_ext_Bode)
 % stepinfo(TF_FTBF_ext_Bode)
 
 clear Alpha K_a Zeta Delta_phi PM K_etoile Omega_g_etoile
 
 
 %% Simulink 
-K_int
+K_int;
 
-X_num = TF_PD_Bi_Num
-X_den = TF_PD_Bi_Den
+X_num = TF_PD_Bi_Num;
+X_den = TF_PD_Bi_Den;
 %Ouvrir Simulink
 Sim_Asservi1 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "10");
 
-X_num = TF_PD_Bode_Num
-X_den = TF_PD_Bode_Den
+X_num = TF_PD_Bode_Num;
+X_den = TF_PD_Bode_Den;
 %Ouvrir Simulink
 Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "10");
 
 %Trouver les Max pour les validation par Simulink
-Max_CD_Bi= max(rad2deg(Sim_Asservi1.Theta_Cd.Data))
-Max_V_Bi = max(Sim_Asservi1.Vm_out.Data)
+% Max_CD_Bi= max(rad2deg(Sim_Asservi1.Theta_Cd.Data))
+% Max_V_Bi = max(Sim_Asservi1.Vm_out.Data)
 % Max_CD_Bode= max(rad2deg(Sim_Asservi2.Theta_Cd.Data))
 % Max_V_Bode = max(Sim_Asservi2.Vm_out.Data)
 
