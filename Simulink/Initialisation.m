@@ -118,10 +118,10 @@ Inter = Intersection + Imaginaire*i;
 K_int = real((((-1)*den_mot(1)*(Inter^2)) + ((-1)*den_mot(2)*(Inter^1))) / (num_mot(1)));
 
 %Calcul (SI-2)
-Ts = 4/Intersection
-TF_temp = feedback(K_cri*TF_mot, 1)
-minreal(TF_temp)
-Ts = 4/(38.8/2)
+% Ts = 4/Intersection
+% TF_temp = feedback(K_cri*TF_mot, 1)
+% minreal(TF_temp)
+% Ts = 4/(38.8/2)
 
 %Graphique (SC-3)
 % figure
@@ -166,7 +166,7 @@ D_int = D;
 A_int(4,3) = (-1)*(B(4,1))*K_int;
 B_int(4,1) = K_int*B(4,1);
 
-%Valeurs propre SI-7
+%Valeurs propre (SI-7)
 % eig(A_int)
 % A_int
 % B_int
@@ -187,8 +187,14 @@ B_int(4,1) = K_int*B(4,1);
 % margin(K_int*TF_mot)
 
 %Rlocus (SI-10)
-% figure
-% rlocus(FTBF_TF_int_ordre4, "blue")
+figure
+rlocus(FTBF_TF_int_ordre4, "blue")
+
+%Trouver les valeurs des fonctions (SI-8)
+% [num, den] = ss2tf(A_int, B_int, C_int, D_int)
+% roots(den(1,:))
+% minreal(tf(num(1,:), den(1,:)))
+% minreal(tf(num(2,:), den(1,:)))
 
 %% Boucle Externe BI
 %Variables
@@ -337,6 +343,7 @@ Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", "10");
 % plot(Sim_Non_Lin_Asservi1.X.Time, Sim_Non_Lin_Asservi1.X.Data, "red");
 % Valeur_Demander = (Test_Position*ones(length(Sim_Non_Lin_Asservi1.X.Time),1));
 % plot(Sim_Non_Lin_Asservi1.X.Time, Valeur_Demander, "blue");
+% grid on
 % % t_p
 % [Max_Sorti_X, IndexMax] = max(Sim_Non_Lin_Asservi1.X.Data);
 % scatter(Sim_Non_Lin_Asservi1.X.Time(IndexMax), Sim_Non_Lin_Asservi1.X.Data(IndexMax), 100, "square", 'black');
@@ -357,6 +364,7 @@ Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", "10");
 % plot(Sim_Non_Lin_Asservi2.X, "red");
 % Valeur_Demander = (Test_Position*ones(length(Sim_Non_Lin_Asservi2.X.Time),1));
 % plot(Sim_Non_Lin_Asservi2.X.Time, Valeur_Demander, "blue");
+% grid on
 % % t_p
 % [Max_Sorti_X, IndexMax] = max(Sim_Non_Lin_Asservi2.X.Data);
 % scatter(Sim_Non_Lin_Asservi2.X.Time(IndexMax), Sim_Non_Lin_Asservi2.X.Data(IndexMax), 100, "square", 'black');

@@ -90,10 +90,18 @@ den_mot_simu = [R_m*J_eq  (R_m*B_eq+n_g*n_m*k_m*k_t*K_g.^2)];
 %Fonction de base X/theta_c
 num_bille = [5*g*r_arm];
 den_bille = [7*L 0 0];
-TF_bille = tf(num_bille, den_bille)
+TF_bille = tf(num_bille, den_bille);
 %Fonction de V_x/theta_C
 num_bille_simu = [5*g*r_arm];
 den_bille_simu = [7*L 0];
+
+
+%Multiplie ensemble (SM-7)
+% TF_temp = TF_mot * TF_bille
+% [p, z] = pzmap(TF_temp)
+% figure
+% rlocus(TF_temp, "blue")
+% xlim([-100, 80])
 
 %% Boucle interne trouver les K avec Rlocus
 %Trouver automatiquement le gain (SI-3)
@@ -108,6 +116,12 @@ Inter = Intersection + Imaginaire*i;
 
 %Calcul de K_int (SI-3)
 K_int = real((((-1)*den_mot(1)*(Inter^2)) + ((-1)*den_mot(2)*(Inter^1))) / (num_mot(1)));
+
+%Calcul (SI-2)
+% Ts = 4/Intersection
+% TF_temp = feedback(K_cri*TF_mot, 1)
+% minreal(TF_temp)
+% Ts = 4/(38.8/2)
 
 %Graphique (SC-3)
 % figure
@@ -323,6 +337,7 @@ Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", "10");
 % plot(Sim_Non_Lin_Asservi1.X.Time, Sim_Non_Lin_Asservi1.X.Data, "red");
 % Valeur_Demander = (Test_Position*ones(length(Sim_Non_Lin_Asservi1.X.Time),1));
 % plot(Sim_Non_Lin_Asservi1.X.Time, Valeur_Demander, "blue");
+% grid on
 % % t_p
 % [Max_Sorti_X, IndexMax] = max(Sim_Non_Lin_Asservi1.X.Data);
 % scatter(Sim_Non_Lin_Asservi1.X.Time(IndexMax), Sim_Non_Lin_Asservi1.X.Data(IndexMax), 100, "square", 'black');
@@ -343,6 +358,7 @@ Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", "10");
 % plot(Sim_Non_Lin_Asservi2.X, "red");
 % Valeur_Demander = (Test_Position*ones(length(Sim_Non_Lin_Asservi2.X.Time),1));
 % plot(Sim_Non_Lin_Asservi2.X.Time, Valeur_Demander, "blue");
+% grid on
 % % t_p
 % [Max_Sorti_X, IndexMax] = max(Sim_Non_Lin_Asservi2.X.Data);
 % scatter(Sim_Non_Lin_Asservi2.X.Time(IndexMax), Sim_Non_Lin_Asservi2.X.Data(IndexMax), 100, "square", 'black');
