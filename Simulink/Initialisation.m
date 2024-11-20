@@ -187,8 +187,8 @@ B_int(4,1) = K_int*B(4,1);
 % margin(K_int*TF_mot)
 
 %Rlocus (SI-10)
-figure
-rlocus(FTBF_TF_int_ordre4, "blue")
+% figure
+% rlocus(FTBF_TF_int_ordre4, "blue")
 
 %Trouver les valeurs des fonctions (SI-8)
 % [num, den] = ss2tf(A_int, B_int, C_int, D_int)
@@ -308,15 +308,15 @@ clear Alpha K_a Zeta Delta_phi PM K_etoile Omega_g_etoile
 
 
 %% Simulink 
-K_int;
+K_int
 
-X_num = TF_PD_Bi_Num;
-X_den = TF_PD_Bi_Den;
+X_num = TF_PD_Bi_Num
+X_den = TF_PD_Bi_Den
 %Ouvrir Simulink
 Sim_Asservi1 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "10");
 
-X_num = TF_PD_Bode_Num;
-X_den = TF_PD_Bode_Den;
+X_num = TF_PD_Bode_Num
+X_den = TF_PD_Bode_Den
 %Ouvrir Simulink
 Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "10");
 

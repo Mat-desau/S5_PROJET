@@ -117,6 +117,8 @@ Inter = Intersection + Imaginaire*i;
 %Calcul de K_int (SI-3)
 K_int = real((((-1)*den_mot(1)*(Inter^2)) + ((-1)*den_mot(2)*(Inter^1))) / (num_mot(1)));
 
+K_int = 12;
+
 %Calcul (SI-2)
 % Ts = 4/Intersection
 % TF_temp = feedback(K_cri*TF_mot, 1)
@@ -166,7 +168,7 @@ D_int = D;
 A_int(4,3) = (-1)*(B(4,1))*K_int;
 B_int(4,1) = K_int*B(4,1);
 
-%Valeurs propre SI-7
+%Valeurs propre (SI-7)
 % eig(A_int)
 % A_int
 % B_int
@@ -189,6 +191,12 @@ B_int(4,1) = K_int*B(4,1);
 %Rlocus (SI-10)
 % figure
 % rlocus(FTBF_TF_int_ordre4, "blue")
+
+%Trouver les valeurs des fonctions (SI-8)
+% [num, den] = ss2tf(A_int, B_int, C_int, D_int)
+% roots(den(1,:))
+% minreal(tf(num(1,:), den(1,:)))
+% minreal(tf(num(2,:), den(1,:)))
 
 %% Boucle Externe BI
 %Variables
@@ -302,23 +310,23 @@ clear Alpha K_a Zeta Delta_phi PM K_etoile Omega_g_etoile
 
 
 %% Simulink 
-K_int;
+K_int
 
-X_num = TF_PD_Bi_Num;
-X_den = TF_PD_Bi_Den;
+X_num = TF_PD_Bi_Num
+X_den = TF_PD_Bi_Den
 %Ouvrir Simulink
 Sim_Asservi1 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "10");
 
-X_num = TF_PD_Bode_Num;
-X_den = TF_PD_Bode_Den;
+X_num = TF_PD_Bode_Num
+X_den = TF_PD_Bode_Den
 %Ouvrir Simulink
 Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "10");
 
 %Trouver les Max pour les validation par Simulink
-% Max_CD_Bi= max(rad2deg(Sim_Asservi1.Theta_Cd.Data))
-% Max_V_Bi = max(Sim_Asservi1.Vm_out.Data)
-% Max_CD_Bode= max(rad2deg(Sim_Asservi2.Theta_Cd.Data))
-% Max_V_Bode = max(Sim_Asservi2.Vm_out.Data)
+Max_CD_Bi= max(rad2deg(Sim_Asservi1.Theta_Cd.Data))
+Max_V_Bi = max(Sim_Asservi1.Vm_out.Data)
+Max_CD_Bode= max(rad2deg(Sim_Asservi2.Theta_Cd.Data))
+Max_V_Bode = max(Sim_Asservi2.Vm_out.Data)
 
 %% Validation sur modèle non-linéraire
 X_num = TF_PD_Bi_Num;
