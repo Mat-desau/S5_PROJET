@@ -24,8 +24,11 @@ r_s = 0.0127;   % m
 g = 9.81;   % m/s^2
 
 %Poutre
-L = 0.4254; % m
+L_poutre = 0.4254; % m
 r_arm = 0.0254; % m
+
+%Plaque
+L_plaque = 0.2750; %m
 
 %% Calcul des valeurs manquante
 %Aller chercher les valeurs manquante dans l'autre fichier (R_m, B_eq, J_c, tsimu, Vm)
@@ -63,7 +66,7 @@ clear Iden Variables Path
 %% Matrices A,B,C,D
 %On resort nos matrices A,B,C,D en fonction de J_eq et de B_eq
 A = [0 1            0                                       0;
-     0 0   ((5*g*r_arm)/(7*L))                              0;
+     0 0   ((5*g*r_arm)/(7*L_poutre))                              0;
      0 0            0                                       1;
      0 0            0             (((-n_m*n_g*k_t*(K_g^2)*k_m)-(R_m*B_eq))/(R_m*J_eq))];
 
@@ -89,11 +92,11 @@ den_mot_simu = [R_m*J_eq  (R_m*B_eq+n_g*n_m*k_m*k_t*K_g.^2)];
 
 %Fonction de base X/theta_c
 num_bille = [5*g*r_arm];
-den_bille = [7*L 0 0];
+den_bille = [7*L_poutre 0 0];
 TF_bille = tf(num_bille, den_bille);
 %Fonction de V_x/theta_C
 num_bille_simu = [5*g*r_arm];
-den_bille_simu = [7*L 0];
+den_bille_simu = [7*L_poutre 0];
 
 
 %Multiplie ensemble (SM-7)
@@ -116,8 +119,6 @@ Inter = Intersection + Imaginaire*i;
 
 %Calcul de K_int (SI-3)
 K_int = real((((-1)*den_mot(1)*(Inter^2)) + ((-1)*den_mot(2)*(Inter^1))) / (num_mot(1)));
-
-K_int = 12;
 
 %Calcul (SI-2)
 % Ts = 4/Intersection
@@ -308,8 +309,10 @@ TF_FTBF_ext_Bode = feedback(TF_FTBO_ext_Bode, 1);
 
 clear Alpha K_a Zeta Delta_phi PM K_etoile Omega_g_etoile
 
+%% Poutre Sphère
 
-%% Simulink 
+
+%% Simulink
 K_int
 
 X_num = TF_PD_Bi_Num
@@ -323,12 +326,13 @@ X_den = TF_PD_Bode_Den
 Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "10");
 
 %Trouver les Max pour les validation par Simulink
-Max_CD_Bi= max(rad2deg(Sim_Asservi1.Theta_Cd.Data))
-Max_V_Bi = max(Sim_Asservi1.Vm_out.Data)
-Max_CD_Bode= max(rad2deg(Sim_Asservi2.Theta_Cd.Data))
-Max_V_Bode = max(Sim_Asservi2.Vm_out.Data)
+% Max_CD_Bi= max(rad2deg(Sim_Asservi1.Theta_Cd.Data))
+% Max_V_Bi = max(Sim_Asservi1.Vm_out.Data)
+% Max_CD_Bode= max(rad2deg(Sim_Asservi2.Theta_Cd.Data))
+% Max_V_Bode = max(Sim_Asservi2.Vm_out.Data)
 
-%% Validation sur modèle non-linéraire
+
+%% Validation sur modèle non-linéraire Poutre-Sphere
 X_num = TF_PD_Bi_Num;
 X_den = TF_PD_Bi_Den;
 %Ouvrir Simulink

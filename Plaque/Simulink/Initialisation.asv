@@ -18,14 +18,17 @@ J_m = 3.9001*10^(-07);  %kg*m^2
 J_eq = 0.0017728;   %kg*m^2
 
 %Sphère
-m_s = 0.0640;   % kg
-J_s = 4.1290*10^(-06);  % kg*m^2
-r_s = 0.0127;   % m
+m_s = 0.0030;   % kg
+J_s = 7.7028125*10^(-07);  % kg*m^2
+r_s = 0.019625;   % m
 g = 9.81;   % m/s^2
 
 %Poutre
-L = 0.4254; % m
+L_poutre = 0.4254; % m
 r_arm = 0.0254; % m
+
+%Plaque
+L_plaque = 0.2750; %m
 
 %% Calcul des valeurs manquante
 %Aller chercher les valeurs manquante dans l'autre fichier (R_m, B_eq, J_c, tsimu, Vm)
@@ -63,7 +66,7 @@ clear Iden Variables Path
 %% Matrices A,B,C,D
 %On resort nos matrices A,B,C,D en fonction de J_eq et de B_eq
 A = [0 1            0                                       0;
-     0 0   ((5*g*r_arm)/(7*L))                              0;
+     0 0   ((5*g*r_arm)/(7*L_poutre))                              0;
      0 0            0                                       1;
      0 0            0             (((-n_m*n_g*k_t*(K_g^2)*k_m)-(R_m*B_eq))/(R_m*J_eq))];
 
@@ -89,12 +92,11 @@ den_mot_simu = [R_m*J_eq  (R_m*B_eq+n_g*n_m*k_m*k_t*K_g.^2)];
 
 %Fonction de base X/theta_c
 num_bille = [5*g*r_arm];
-den_bille = [7*L 0 0];
+den_bille = [7*L_poutre 0 0];
 TF_bille = tf(num_bille, den_bille);
 %Fonction de V_x/theta_C
 num_bille_simu = [5*g*r_arm];
-den_bille_simu = [7*L 0];
-
+den_bille_simu = [7*L_poutre 0];
 
 %Multiplie ensemble (SM-7)
 % TF_temp = TF_mot * TF_bille
@@ -140,11 +142,11 @@ clear Imaginaire angle_Phi Intersection Inter p
 
 %% Modèle Simulink Linéraire
 % Ouvrir Simulink
-Sim_Lin = sim('Modele_Lineaire.slx', "StopTime", "10");
+%Sim_Lin = sim('Modele_Lineaire.slx', "StopTime", "10");
 
 %% Modèle Simulink Non-Linéaire% Ouvrir Simulink
 % Ouvrir Simulink
-Sim_Non_Lin = sim('Modele_Non_Lineaire.slx', "StopTime", "10");
+%Sim_Non_Lin = sim('Modele_Non_Lineaire.slx', "StopTime", "10");
 
 %% Boucle interne
 %Boucle interne
@@ -197,23 +199,22 @@ B_int(4,1) = K_int*B(4,1);
 % minreal(tf(num(2,:), den(1,:)))
 
 %% Boucle Externe BI
+clc
+close all
 %Variables
 M_p = 5; % Important ceci est en pourcent
-t_s = 4; % sec
-t_r = 2; % sec
-t_p = 3; % sec
+t_s = 3; % sec
 
 % Ajustement des valeurs pour Bisectrice
-Ajout_Omega_a = 0.4; %0.4
-Ajout_Omega_n = 0.025; %0.025
+Ajout_Omega_a = -0.4; %0.0
+Ajout_Omega_n = -0.2; %0.0
 
 %Calculs par bisectrice
 Phi = atan((-pi) / log(M_p/100));
 Zeta = cos(Phi);
-Omega_a = (pi / t_p) - Ajout_Omega_a;
-    % Omega_n = Omega_a / sqrt(1-Zeta^2)
-    % Omega_n = (1+(1.1*Zeta)+(1.4*Zeta^2)) / t_r
-Omega_n = 4 / (Zeta*t_s); % On prends celle-ci car elle a Omega_n le plus haut
+
+Omega_n = 4 / (Zeta*t_s)
+Omega_a = Omega_n*sqrt(1-Zeta^2) + Ajout_Omega_a
 
 %Calcul du des P étoiles pour les poles à faire passer la nouvelle fonction
 P_etoile = ((((-1)*Omega_n*Zeta)+Ajout_Omega_n) + Omega_a*i);
@@ -242,23 +243,28 @@ TF_PD_Bi = TF_PD_Bi * K_a;
 TF_FTBO_ext_Bi = TF_FTBO_ext_Bi * K_a;
 TF_FTBF_ext_Bi = feedback(TF_FTBO_ext_Bi, 1);
 
-%Validation par margin  (GM > 10 et PM > 45deg)
+%Validation par margin  (GM > 10 et PM > 55deg)
 % figure 
 % margin(TF_FTBO_ext_Bi)
+[Gm, Pm, wgm, wpm] = margin(TF_FTBO_ext_Bi);
 
-%Validation par step info  (Mp = 30% +- 0.1 et t_s = 5 +- 0.1)
-% stepinfo(TF_FTBF_ext_Bi)
+Gm = 20*log10(Gm)
+Pm
+
+%Validation par step info  (Mp = 18% et t_s = 6)
+stepinfo(TF_FTBF_ext_Bi)
 
 %Validation par Simulink
 %Valider Omega_CD (+- 56°)
 %Valider Vm (+- 10)
         
         %Afficher le Rlocus avec les points
-        % figure
-        % hold on
-        % rlocus(TF_FTBO_ext_Bi, 'red');
-        % scatter(real(P_etoile),imag(P_etoile), '^', "blue");
-        % scatter(real(P_etoile),imag(-P_etoile), '^', "blue");
+        figure
+        hold on
+        rlocus(TF_FTBO_ext_Bi, 'red');
+        scatter(real(P_etoile),imag(P_etoile), '^', "blue");
+        scatter(real(P_etoile),imag(-P_etoile), '^', "blue");
+        xlim([-10 1]);
 
 %Enlever non-utiliser
 clear Z_temp P_temp Phi_z Phi_p Alpha K_a Zeta Delta_phi Angle_FTBF_TF_int Omega_n Omega_a Phi P_etoile Ajout_Omega_n Ajout_Omega_a
@@ -306,19 +312,21 @@ TF_FTBF_ext_Bode = feedback(TF_FTBO_ext_Bode, 1);
 
 clear Alpha K_a Zeta Delta_phi PM K_etoile Omega_g_etoile
 
+%% Poutre Sphère
 
-%% Simulink 
+
+%% Simulink
 K_int
 
 X_num = TF_PD_Bi_Num
 X_den = TF_PD_Bi_Den
 %Ouvrir Simulink
-Sim_Asservi1 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "10");
+%Sim_Asservi1 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "10");
 
 X_num = TF_PD_Bode_Num
 X_den = TF_PD_Bode_Den
 %Ouvrir Simulink
-Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "10");
+%Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "10");
 
 %Trouver les Max pour les validation par Simulink
 % Max_CD_Bi= max(rad2deg(Sim_Asservi1.Theta_Cd.Data))
@@ -326,16 +334,17 @@ Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "10");
 % Max_CD_Bode= max(rad2deg(Sim_Asservi2.Theta_Cd.Data))
 % Max_V_Bode = max(Sim_Asservi2.Vm_out.Data)
 
-%% Validation sur modèle non-linéraire
+
+%% Validation sur modèle non-linéraire Poutre-Sphere
 X_num = TF_PD_Bi_Num;
 X_den = TF_PD_Bi_Den;
 %Ouvrir Simulink
-Sim_Non_Lin_Asservi1 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", "10");
+%Sim_Non_Lin_Asservi1 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", "10");
 
 X_num = TF_PD_Bode_Num;
 X_den = TF_PD_Bode_Den;
 %Ouvrir Simulink
-Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", "10");
+%Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", "10");
 
 %Position résultat (SE-4)
 % figure
