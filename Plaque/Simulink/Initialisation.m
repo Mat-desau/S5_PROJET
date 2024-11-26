@@ -28,7 +28,7 @@ L_poutre = 0.4254; % m
 r_arm = 0.0254; % m
 
 %Plaque
-L_plaque = 0.2750; %m
+L_plaque = 0.2750/2; %m
 
 %% Calcul des valeurs manquante
 %Aller chercher les valeurs manquante dans l'autre fichier (R_m, B_eq, J_c, tsimu, Vm)
@@ -199,22 +199,20 @@ B_int(4,1) = K_int*B(4,1);
 % minreal(tf(num(2,:), den(1,:)))
 
 %% Boucle Externe BI
-clc
-close all
 %Variables
 M_p = 5; % Important ceci est en pourcent
 t_s = 3; % sec
 
 % Ajustement des valeurs pour Bisectrice
-Ajout_Omega_a = -0.0; %-0.861
-Ajout_Omega_n = 0.0; %0.139
+Ajout_Omega_a = -1.018; %-0.0
+Ajout_Omega_n = +0.5; %0.0
 
 %Calculs par bisectrice
 Phi = atan((-pi) / log(M_p/100));
 Zeta = cos(Phi);
 
-Omega_n = 4 / (Zeta*t_s)
-Omega_a = Omega_n*sqrt(1-Zeta^2) + Ajout_Omega_a
+Omega_n = 4 / (Zeta*t_s);
+Omega_a = Omega_n*sqrt(1-Zeta^2) + Ajout_Omega_a;
 
 %Calcul du des P étoiles pour les poles à faire passer la nouvelle fonction
 P_etoile = ((((-1)*Omega_n*Zeta)+Ajout_Omega_n) + Omega_a*i);
@@ -271,8 +269,6 @@ stepinfo(TF_FTBF_ext_Bi)
 clear Z_temp P_temp Phi_z Phi_p Alpha K_a Zeta Delta_phi Angle_FTBF_TF_int Omega_n Omega_a Phi P_etoile Ajout_Omega_n Ajout_Omega_a
 
 %% Boucle Externe Bode
-clc
-close all
 %Ajustement
 Ajout_BW = 0.0; %0.170
 Ajout_PM = 0.0; %-0.1
@@ -319,11 +315,8 @@ stepinfo(TF_FTBF_ext_Bode)
 
 clear Alpha K_a Zeta Delta_phi PM K_etoile Omega_g_etoile
 
-%% Poutre Sphère
-
-
 %% Simulink
-K_int
+K_int;
 
 X_num = TF_PD_Bi_Num;
 X_den = TF_PD_Bi_Den;
