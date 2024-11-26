@@ -66,7 +66,7 @@ clear Iden Variables Path
 %% Matrices A,B,C,D
 %On resort nos matrices A,B,C,D en fonction de J_eq et de B_eq
 A = [0 1            0                                       0;
-     0 0   ((5*g*r_arm)/(7*L_plaque))                              0;
+     0 0   ((5*g*r_arm)/(7*L_plaque))                       0;
      0 0            0                                       1;
      0 0            0             (((-n_m*n_g*k_t*(K_g^2)*k_m)-(R_m*B_eq))/(R_m*J_eq))];
 
@@ -107,7 +107,7 @@ den_bille_simu = [7*L_plaque 0];
 
 %% Boucle interne trouver les K avec Rlocus
 %Trouver automatiquement le gain (SI-3)
-[~,p,~]=residue(num_mot,den_mot);
+[~,p,~] = residue(num_mot,den_mot);
 Intersection = sum(p)/(length(den_mot)-1);
 K_cri = (((-1)*den_mot(1)*(Intersection^2)) + ((-1)*den_mot(2)*(Intersection^1))) / (num_mot(1));
 
@@ -204,15 +204,15 @@ M_p = 5; % Important ceci est en pourcent
 t_s = 3; % sec
 
 % Ajustement des valeurs pour Bisectrice
-Ajout_Omega_a = -1.018; %-0.0
-Ajout_Omega_n = +0.5; %0.0
+Ajout_Omega_a = -1.002; %-0.0
+Ajout_Omega_n = 0.506; %0.0
 
 %Calculs par bisectrice
 Phi = atan((-pi) / log(M_p/100));
 Zeta = cos(Phi);
 
 Omega_n = 4 / (Zeta*t_s);
-Omega_a = Omega_n*sqrt(1-Zeta^2) + Ajout_Omega_a;
+Omega_a = (Omega_n*sqrt(1-Zeta^2)) + Ajout_Omega_a;
 
 %Calcul du des P étoiles pour les poles à faire passer la nouvelle fonction
 P_etoile = ((((-1)*Omega_n*Zeta)+Ajout_Omega_n) + Omega_a*i);
@@ -244,26 +244,34 @@ TF_FTBF_ext_Bi = feedback(TF_FTBO_ext_Bi, 1);
 %Validation par margin  (GM > 10 et PM > 55deg)
 % figure 
 % margin(TF_FTBO_ext_Bi)
-[Gm, Pm, wgm, wpm] = margin(TF_FTBO_ext_Bi);
+% [Gm, Pm, wgm, wpm] = margin(TF_FTBO_ext_Bi);
 
-Gm = 20*log10(Gm)
-Pm
+% Gm = 20*log10(Gm)
+% Pm
 
 %Validation par step info  (Mp = 18% et t_s = 6)
-stepinfo(TF_FTBF_ext_Bi)
+% stepinfo(TF_FTBF_ext_Bi)
 
 %Validation par Simulink
 %Valider Omega_CD (+- 56°)
 %Valider Vm (+- 10)
         
         %Afficher le Rlocus avec les points
-        figure
-        hold on
-        rlocus(TF_FTBO_ext_Bi, 'red');
-        scatter(real(P_etoile),imag(P_etoile), '^', "blue");
-        scatter(real(P_etoile),imag(-P_etoile), '^', "blue");
-        xlim([-25 1]);
-        ylim([-30 30]);
+        % figure
+        % hold on
+        % rlocus(TF_FTBO_ext_Bi, 'red');
+        % scatter(real(P_etoile),imag(P_etoile), '^', "blue");
+        % scatter(real(P_etoile),imag(-P_etoile), '^', "blue");
+        % xlim([-10 1]);
+        % ylim([-20 20]);
+
+% X_num = TF_PD_Bi_Num;
+% X_den = TF_PD_Bi_Den;
+% %Ouvrir Simulink
+% Sim_Asservi1 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "10");
+% %Trouver les Max pour les validation par Simulink
+% Max_CD_Bi= max(rad2deg(Sim_Asservi1.Theta_Cd.Data))
+% Max_V_Bi = max(Sim_Asservi1.Vm_out.Data)
 
 %Enlever non-utiliser
 clear Z_temp P_temp Phi_z Phi_p Alpha K_a Zeta Delta_phi Angle_FTBF_TF_int Omega_n Omega_a Phi P_etoile Ajout_Omega_n Ajout_Omega_a
@@ -301,19 +309,36 @@ TF_FTBF_ext_Bode = feedback(TF_FTBO_ext_Bode, 1);
 %Validation margin(GM = 12 +- 1 dB et PM = 45 +- 0.1 deg) 
 % figure;
 % margin(TF_FTBO_ext_Bode);
-[Gm, Pm, wgm, wpm] = margin(TF_FTBO_ext_Bode);
-
-Gm = 20*log10(Gm)
-Pm
+% [Gm, Pm, wgm, wpm] = margin(TF_FTBO_ext_Bode);
+% 
+% Gm = 20*log10(Gm)
+% Pm
 
 
 %Validation Bandwidth (BW > 2.5)
 % BW_Cal = bandwidth(TF_FTBF_ext_Bode)
 
 %Validation de StepInfo (t_s = 4.5 +- 0.05 sec)
-stepinfo(TF_FTBF_ext_Bode)
+% stepinfo(TF_FTBF_ext_Bode)
 
 clear Alpha K_a Zeta Delta_phi PM K_etoile Omega_g_etoile
+
+%% Trajectoires
+%Aller chercher les valeurs pour les trajectoires
+%Trouver le path
+Path = which("Initialisation.m");
+Path = strrep(Path, '/Simulink/Initialisation.m', '/Trajectoire/Trajectoire.mat');
+Path = strrep(Path, '\Simulink\Initialisation.m', '\Trajectoire\Trajectoire.mat');
+
+%Ce qu'on veut sortir
+Variables = {""};
+
+%Sortir en structure
+Iden = load(Path, Variables{:});
+
+%Remplacer les structure par leur variables chercher
+
+clear Iden Variables Path
 
 %% Simulink
 K_int;
@@ -329,10 +354,10 @@ X_den = TF_PD_Bode_Den;
 Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "10");
 
 %Trouver les Max pour les validation par Simulink
-Max_CD_Bi= max(rad2deg(Sim_Asservi1.Theta_Cd.Data))
-Max_V_Bi = max(Sim_Asservi1.Vm_out.Data)
-Max_CD_Bode= max(rad2deg(Sim_Asservi2.Theta_Cd.Data))
-Max_V_Bode = max(Sim_Asservi2.Vm_out.Data)
+% Max_CD_Bi= max(rad2deg(Sim_Asservi1.Theta_Cd.Data))
+% Max_V_Bi = max(Sim_Asservi1.Vm_out.Data)
+% Max_CD_Bode= max(rad2deg(Sim_Asservi2.Theta_Cd.Data))
+% Max_V_Bode = max(Sim_Asservi2.Vm_out.Data)
 
 
 %% Validation sur modèle non-linéraire Poutre-Sphere
