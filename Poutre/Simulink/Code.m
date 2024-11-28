@@ -33,9 +33,9 @@ L_plaque = 0.2750; %m
 %% Calcul des valeurs manquante
 %Aller chercher les valeurs manquante dans l'autre fichier (R_m, B_eq, J_c, tsimu, Vm)
 %Trouver le path
-Path = which("Initialisation.m");
-Path = strrep(Path, '/Simulink/Initialisation.m', '/Identification Moteur/Valeurs.mat');
-Path = strrep(Path, '\Simulink\Initialisation.m', '\Identification Moteur\Valeurs.mat');
+Path = which("Code.m");
+Path = strrep(Path, '/Simulink/Code.m', '/Identification Moteur/Valeurs.mat');
+Path = strrep(Path, '\Simulink\Code.m', '\Identification Moteur\Valeurs.mat');
 
 %Ce qu'on veut sortir
 Variables = {"B_eq","J_c", "R_m", "tsimu", "Vm", "servo"};
@@ -118,7 +118,7 @@ Imaginaire = Intersection*tan(angle_Phi);
 Inter = Intersection + Imaginaire*i;
 
 %Calcul de K_int (SI-3)
-K_int = real((((-1)*den_mot(1)*(Inter^2)) + ((-1)*den_mot(2)*(Inter^1))) / (num_mot(1)));
+K_int = real((((-1)*den_mot(1)*(Inter^2)) + ((-1)*den_mot(2)*(Inter^1))) / (num_mot(1)))
 
 %Calcul (SI-2)
 % Ts = 4/Intersection
