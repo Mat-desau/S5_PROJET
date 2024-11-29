@@ -326,7 +326,7 @@ Path = strrep(Path, '/Simulink/Code.m', '/Trajectoire/Trajectoire.mat');
 Path = strrep(Path, '\Simulink\Code.m', '\Trajectoire\Trajectoire.mat');
 
 %Ce qu'on veut sortir
-Variables = {"H1", "H2"};
+Variables = {"H1", "H2", "OUT"};
 
 %Sortir en structure
 Trajectoire = load(Path, Variables{:});
@@ -340,6 +340,7 @@ result_array = start_value:step_size:end_value;
 
 Hx = timeseries(Trajectoire.H2, result_array);
 Hy = timeseries(Trajectoire.H1, result_array);
+OUT = Trajectoire.OUT;
 
 clear Trajectoire Variables Path
 
@@ -347,24 +348,24 @@ clear Trajectoire Variables Path
 X_num = TF_PD_Bi_Num;
 X_den = TF_PD_Bi_Den;
 %Ouvrir Simulink
-Sim_Asservi1 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "140");
+Sim_Asservi1 = sim('Modele_Lineaire_Asservi.slx', "StopTime", string(end_value));
 
 X_num = TF_PD_Bode_Num;
 X_den = TF_PD_Bode_Den;
 %Ouvrir Simulink
-Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx', "StopTime", "140");
+Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx', "StopTime", string(end_value));
 
 
 %% Validation sur modèle non-linéraire Poutre-Sphere
 X_num = TF_PD_Bi_Num;
 X_den = TF_PD_Bi_Den;
 %Ouvrir Simulink
-Sim_Non_Lin_Asservi1 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", "140");
+Sim_Non_Lin_Asservi1 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", string(end_value));
 
 X_num = TF_PD_Bode_Num;
 X_den = TF_PD_Bode_Den;
 %Ouvrir Simulink
-Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", "140");
+Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", string(end_value));
 
 
 %Trouver les Max pour les validation par Simulink
@@ -573,8 +574,6 @@ Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", "140")
             figure
             hold on
             plot(Sim_Non_Lin_Asservi2.X, Sim_Non_Lin_Asservi2.Y)
-            OUT = [0.0/100  3.0/100   0.0/100  -3.0/100  -3.0/100  -3.0/100   3.0/100   0.0/100;
-                   0.0/100  3.0/100   3.0/100   3.0/100   0.0/100  -3.0/100  -3.0/100   0.0/100]';
             scatter(OUT(:,1), OUT(:,2), "red")
 
 % Erreur = max(Sim_Non_Lin_Asservi1.Theta_Cd_X-Sim_Non_Lin_Asservi1.Theta_C_X)
