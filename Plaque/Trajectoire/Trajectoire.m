@@ -45,6 +45,10 @@ A2 = pinv(C)*S2;
 H1 = A1(8).*Position.^7 + A1(7).*Position.^6 + A1(6).*Position.^5 + A1(5).*Position.^4 + A1(4).*Position.^3 + A1(3).*Position.^2 + A1(2).*Position + A1(1);
 H2 = A2(8).*Position.^7 + A2(7).*Position.^6 + A2(6).*Position.^5 + A2(5).*Position.^4 + A2(4).*Position.^3 + A2(3).*Position.^2 + A2(2).*Position + A2(1);
 
+%Pour la longueur
+dH1 = 7*A1(8).*Position.^6 + 6*A1(7).*Position.^5 + 5*A1(6).*Position.^4 + 4*A1(5).*Position.^3 + 3*A1(4).*Position.^2 + 2*A1(3).*Position + A1(2).*Position;
+dH2 = 7*A2(8).*Position.^6 + 6*A2(7).*Position.^5 + 5*A2(6).*Position.^4 + 4*A2(5).*Position.^3 + 3*A2(4).*Position.^2 + 2*A2(3).*Position + A2(2).*Position;
+
 H1 = H1(:);
 H2 = H2(:);
 
