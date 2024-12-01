@@ -575,47 +575,21 @@ Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", string
 
             figure
             hold on
-            plot(Sim_Non_Lin_Asservi2.X, Sim_Non_Lin_Asservi2.Y, "red")
-            scatter(OUT(:,1), OUT(:,2), "blue", 'filled')
+            plot(Sim_Non_Lin_Asservi2.X, Sim_Non_Lin_Asservi2.Y)
+            scatter(OUT(:,1), OUT(:,2), "red")
             xlabel("Distance (m)")
             ylabel("Distance (m)")
             title("Simulation trajectoire")
             legend(["Trajet", "Points désirer"])
-            xlim([-0.04 0.08])
-            ylim([-0.05 0.05])
 
 % disp("-------------------------Bisectrice----------------------");
 % Erreur = max(Sim_Non_Lin_Asservi1.Theta_Cd_X-Sim_Non_Lin_Asservi1.Theta_C_X)
 % Erreur = max(Sim_Non_Lin_Asservi1.Entree-Sim_Non_Lin_Asservi1.X)
 % disp("-------------------------Bode----------------------");
-% Erreur_Position_X = (Sim_Non_Lin_Asservi2.Theta_Cd_X - Sim_Non_Lin_Asservi2.Theta_C_X);
-% Erreur_Entree_X = (Sim_Non_Lin_Asservi2.Entree_X.Data - Sim_Non_Lin_Asservi2.X);
-% Erreur_Position_Y = (Sim_Non_Lin_Asservi2.Theta_Cd_Y - Sim_Non_Lin_Asservi2.Theta_C_Y);
-% Erreur_Entree_Y = (Sim_Non_Lin_Asservi2.Entree_Y.Data - Sim_Non_Lin_Asservi2.Y);
-% 
-% figure
-% plot(Erreur_Position_X)
-% title("Erreur Position X")
-% xlabel("Temps (sec)")
-% ylabel("Erreur")
-% 
-% figure
-% plot(Sim_Non_Lin_Asservi2.Entree_X.Time,Erreur_Entree_X)
-% title("Erreur Entree X")
-% xlabel("Temps (sec)")
-% ylabel("Erreur")
-% 
-% figure
-% plot(Erreur_Position_Y)
-% title("Erreur Position Y")
-% xlabel("Temps (sec)")
-% ylabel("Erreur")
-% 
-% figure
-% plot(Sim_Non_Lin_Asservi2.Entree_Y.Time, Erreur_Entree_Y)
-% title("Erreur Entree Y")
-% xlabel("Temps (sec)")
-% ylabel("Erreur")
+Erreur_Position_X = max(Sim_Non_Lin_Asservi2.Theta_Cd_X-Sim_Non_Lin_Asservi2.Theta_C_X)
+Erreur_Entree_X = max(Sim_Non_Lin_Asservi2.Entree_X-Sim_Non_Lin_Asservi2.X)
+Erreur_Position_Y = max(Sim_Non_Lin_Asservi2.Theta_Cd_Y-Sim_Non_Lin_Asservi2.Theta_C_Y)
+Erreur_Entree_Y = max(Sim_Non_Lin_Asservi2.Entree_X-Sim_Non_Lin_Asservi2.X)
             
 %Assurer la fin du document
 disp("Hello World")
