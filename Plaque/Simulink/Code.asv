@@ -31,12 +31,12 @@ r_arm = 0.0254; % m
 L_plaque = 0.2750/2; %m
 
 %Savoir c'est quoi l'entree
-Fig_in = 0; % 0=Step      1=Sinus
+Fig_in = 1; % 0=Step      1=Sinus
 Frequence = pi; %rad/s (pi = 0.5hz)
 Test_Angle = pi/4;
-Test_Position = 0.02; % m
+Test_Position = 0.06; % m
 Temp_sim = 10;
-delay = 3;
+delay = 4;
 
 %% Calcul des valeurs manquante
 %Aller chercher les valeurs manquante dans l'autre fichier (R_m, B_eq, J_c, tsimu, Vm)
@@ -238,8 +238,8 @@ P_temp = real(P_etoile) - (imag(P_etoile) / tan(Phi_p));
 %Pour trouver le K_a
 TF_PD_Bi = tf([1 -Z_temp], [1 -P_temp]);
 TF_FTBO_ext_Bi = TF_PD_Bi * FTBF_TF_int_ordre4;
-K_a = 1 / abs(evalfr(TF_FTBO_ext_Bi, P_etoile));
-K_a = 10;
+K_a = 1 / abs(evalfr(TF_FTBO_ext_Bi, P_etoile))
+K_a = 12
 
 %Creation des nouvelles TF
 TF_PD_Bi = TF_PD_Bi * K_a;
@@ -255,9 +255,6 @@ TF_FTBF_ext_Bi = feedback(TF_FTBO_ext_Bi, 1);
 % [Gm, Pm, wgm, wpm] = margin(TF_FTBO_ext_Bi);
 % Gm = 20*log10(Gm)
 % Pm
-% DM = (Pm * (180/pi))/wpm
-
-
 
 %Validation par step info  (Mp = 18% et t_s = 6)
 % stepinfo(TF_FTBF_ext_Bi)
@@ -354,7 +351,6 @@ Path = which("Code.m");
 Path = strrep(Path, 'Code.m', 'Trajectoire_OUT.mat');
 save(Path,"Hy","Hx",'-mat');
 
-end_value = 20;
 clear Trajectoire Variables Path
 
 %% Simulink
@@ -370,7 +366,7 @@ Sim_Asservi2 = sim('Modele_Lineaire_Asservi.slx', "StopTime", string(end_value))
 
 
 %% Validation sur modèle non-linéraire Poutre-Sphere
-K_int;
+K_int
 
 disp("-----BI------")
 X_num = TF_PD_Bi_Num
@@ -491,8 +487,8 @@ Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", string
             figure(F1);
             grid on
             hold on
-            plot(Sim_Non_Lin_Asservi1.Vm_out_X)
-            % plot(Sim_Non_Lin_Asservi2.Vm_out_X)
+            %plot(Sim_Non_Lin_Asservi1.Vm_out_X)
+            plot(Sim_Non_Lin_Asservi2.Vm_out_X)
             title("V_m X")
             % legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
             % legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
@@ -503,13 +499,12 @@ Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", string
             figure(F2);
             hold on
             grid on
-            plot(Sim_Non_Lin_Asservi1.Theta_C_X.Time, Sim_Non_Lin_Asservi1.X)
-            % plot(Sim_Non_Lin_Asservi2.X)
-            %plot(Sim_Non_Lin_Asservi2.Entree_X, "black")
+            % plot(Sim_Non_Lin_Asservi1.X)
+            plot(Sim_Non_Lin_Asservi2.X)
+            plot(Sim_Non_Lin_Asservi2.Entree_X, "black")
             title("Position X")
             % legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
-            % legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
-            % legend(["Bode Non-Linéaire", "Entree"])
+            %legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
             legend(["Bode Non-Linéaire", "Entree"])
             ylabel("Position (m)")
 
@@ -517,26 +512,24 @@ Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", string
             figure(F3);
             hold on
             grid on
-            plot(Sim_Non_Lin_Asservi1.Theta_C_X.Time, rad2deg(Sim_Non_Lin_Asservi1.Theta_C_X.Data))
-            % plot(Sim_Non_Lin_Asservi2.Theta_C_X.Time, rad2deg(Sim_Non_Lin_Asservi2.Theta_C_X.Data))
+            % plot(Sim_Non_Lin_Asservi1.Theta_C_X.Time, rad2deg(Sim_Non_Lin_Asservi1.Theta_C_X.Data))
+            plot(Sim_Non_Lin_Asservi2.Theta_C_X.Time, rad2deg(Sim_Non_Lin_Asservi2.Theta_C_X.Data))
             title("\Theta_C X")
             % legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
             %legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
-            legend(["Bi Non-Linéaire"])
-            % legend(["Bode Non-Linéaire"])
+            legend(["Bode Non-Linéaire"])
             ylabel("Angle (deg)")
 
             %subplot(4,1,4)
             figure(F4);
             hold on
             grid on
-            plot(Sim_Non_Lin_Asservi1.Theta_Cd_X.Time, rad2deg(Sim_Non_Lin_Asservi1.Theta_Cd_X.Data))
-            % plot(Sim_Non_Lin_Asservi2.Theta_Cd_X.Time, rad2deg(Sim_Non_Lin_Asservi2.Theta_Cd_X.Data))
+            % plot(Sim_Non_Lin_Asservi1.Theta_Cd_X.Time, rad2deg(Sim_Non_Lin_Asservi1.Theta_Cd_X.Data))
+            plot(Sim_Non_Lin_Asservi2.Theta_Cd_X.Time, rad2deg(Sim_Non_Lin_Asservi2.Theta_Cd_X.Data))
             title("\Theta_C_d X")
             % legend(["Bi Linéaire", "Bode Linéaire", "Bi Non-Linéaire", "Bode Non-Linéaire"])
-            % legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
-            % legend(["Bode Non-Linéaire"])
-            legend(["Bi Non-Linéaire"])
+            %legend(["Bi Non-Linéaire", "Bode Non-Linéaire"])
+            legend(["Bode Non-Linéaire"])
             ylabel("Angle (deg)")
 
             % 
