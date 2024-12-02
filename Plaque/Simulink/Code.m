@@ -344,6 +344,11 @@ Hx = timeseries(Trajectoire.H2, result_array);
 Hy = timeseries(Trajectoire.H1, result_array);
 OUT = Trajectoire.OUT;
 
+%Sortir pour banc de test
+Path = which("Code.m");
+Path = strrep(Path, 'Code.m', 'Trajectoire_OUT.mat');
+save(Path,"Hy","Hx",'-mat');
+
 clear Trajectoire Variables Path
 
 %% Simulink

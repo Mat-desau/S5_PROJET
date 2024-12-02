@@ -15,10 +15,18 @@ clear all
 % OUT = [0.0/100  3.0/100   5.0/100   3.0/100  -3.0/100  -5.0/100  -3.0/100   0.0/100;
 %        0.0/100  3.0/100   0.0/100  -3.0/100   3.0/100   0.0/100  -3.0/100   0.0/100]';
 
+% OUT_Pos = [0.1375  3.0   0.1375  -3.0  -3.0  -3.0   3.0   0.1375;
+%            0.1375  3.0   3.0   3.0   0.1375  -3.0  -3.0   0.1375]';
+
 OUT = [0.0  3.0   0.0  -3.0  -3.0  -3.0   3.0   0.0;
        0.0  3.0   3.0   3.0   0.0  -3.0  -3.0   0.0]';
 
+
+
+%Mettre en Cm
 OUT = OUT./100;
+%0.1375m milieu
+%0.2750m max
 
 Temps = linspace(1, 8, length(OUT(:,1)));
 Position = 1:0.02:8;
@@ -42,12 +50,26 @@ clear n nn
 A1 = pinv(C)*S;
 A2 = pinv(C)*S2;
 
+%x
 H1 = A1(8).*Position.^7 + A1(7).*Position.^6 + A1(6).*Position.^5 + A1(5).*Position.^4 + A1(4).*Position.^3 + A1(3).*Position.^2 + A1(2).*Position + A1(1);
+%y
 H2 = A2(8).*Position.^7 + A2(7).*Position.^6 + A2(6).*Position.^5 + A2(5).*Position.^4 + A2(4).*Position.^3 + A2(3).*Position.^2 + A2(2).*Position + A2(1);
 
 %Pour la longueur
-dH1 = 7*A1(8).*Position.^6 + 6*A1(7).*Position.^5 + 5*A1(6).*Position.^4 + 4*A1(5).*Position.^3 + 3*A1(4).*Position.^2 + 2*A1(3).*Position + A1(2).*Position;
-dH2 = 7*A2(8).*Position.^6 + 6*A2(7).*Position.^5 + 5*A2(6).*Position.^4 + 4*A2(5).*Position.^3 + 3*A2(4).*Position.^2 + 2*A2(3).*Position + A2(2).*Position;
+%Finale B
+Position2 = Position(end);
+dH1 = 7*A1(8).*Position2.^6 + 6*A1(7).*Position2.^5 + 5*A1(6).*Position2.^4 + 4*A1(5).*Position2.^3 + 3*A1(4).*Position2.^2 + 2*A1(3).*Position2 + A1(2).*Position2;
+dH2 = 7*A2(8).*Position2.^6 + 6*A2(7).*Position2.^5 + 5*A2(6).*Position2.^4 + 4*A2(5).*Position2.^3 + 3*A2(4).*Position2.^2 + 2*A2(3).*Position2 + A2(2).*Position2;
+ans1 = sqrt(1+(dH2/dH1).^2);
+%Depart A
+Position2 = Position(1);
+dH1 = 7*A1(8).*Position2.^6 + 6*A1(7).*Position2.^5 + 5*A1(6).*Position2.^4 + 4*A1(5).*Position2.^3 + 3*A1(4).*Position2.^2 + 2*A1(3).*Position2 + A1(2).*Position2;
+dH2 = 7*A2(8).*Position2.^6 + 6*A2(7).*Position2.^5 + 5*A2(6).*Position2.^4 + 4*A2(5).*Position2.^3 + 3*A2(4).*Position2.^2 + 2*A2(3).*Position2 + A2(2).*Position2;
+ans2 = sqrt(1+(dH2/dH1).^2);
+
+%Les deux ensemble
+Longueur = ans1 + ans2;
+
 
 H1 = H1(:);
 H2 = H2(:);
@@ -73,7 +95,6 @@ legend(["Trajectoire", "Points désirer"])
 Path = which("Trajectoire.m");
 Path = strrep(Path, 'Trajectoire.m', 'Trajectoire.mat');
 save(Path, "-mat");
-
 
 %% Autre
 % Si on veut juste de point vers point
