@@ -63,7 +63,8 @@ Diff1 = diff(Omega_c(1:end,1))/dT;
 Y_iden = Omega_c(1:end-1, 1);
 X_iden = [Vm(1:end-2, 1), Diff1];
 
-A_iden = pinv(X_iden)*Y_iden;
+A_iden = pinv(X_iden)*Y_iden
+A_iden(2) = A_iden(2)*(1.0)
 
 %% Mise en valeur
 %Charge et engrenage

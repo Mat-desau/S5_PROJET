@@ -18,8 +18,8 @@ clear all
 % OUT_Pos = [0.1375  3.0   0.1375  -3.0  -3.0  -3.0   3.0   0.1375;
 %            0.1375  3.0   3.0   3.0   0.1375  -3.0  -3.0   0.1375]';
 
-OUT = [0.0  3.0   0.0  -3.0  -3.0  -3.0   3.0   0.0;
-       0.0  3.0   3.0   3.0   0.0  -3.0  -3.0   0.0]';
+OUT = [0.0  3.0  -3.0  -3.0   3.0  3.0  -3.0   0.0;
+       0.0  3.0   3.0  -3.0  -3.0  3.0   3.0   0.0]';
 
 
 diviser = 100
@@ -29,7 +29,7 @@ OUT = OUT./diviser;
 %0.2750m max
 
 Temps = linspace(1, 8, length(OUT(:,1)));
-Position = (1:0.02:8);
+Position = (1:0.002:8);
 
 %Pour les X
 for n = 1:length(OUT(:,1))
@@ -57,18 +57,23 @@ H2 = A2(8).*Position.^7 + A2(7).*Position.^6 + A2(6).*Position.^5 + A2(5).*Posit
 
 %Pour la longueur
 %Finale B
-Position2 = Position(end)
+Position2 = Position(2:end);
 dH1 = 7*A1(8).*Position2.^6 + 6*A1(7).*Position2.^5 + 5*A1(6).*Position2.^4 + 4*A1(5).*Position2.^3 + 3*A1(4).*Position2.^2 + 2*A1(3).*Position2 + A1(2).*Position2;
 dH2 = 7*A2(8).*Position2.^6 + 6*A2(7).*Position2.^5 + 5*A2(6).*Position2.^4 + 4*A2(5).*Position2.^3 + 3*A2(4).*Position2.^2 + 2*A2(3).*Position2 + A2(2).*Position2;
-ans1 = sqrt(1+(dH2/dH1).^2);
+ans1_1 = sqrt(1+(dH1).^2);
+ans1_2 = sqrt(1+(dH2).^2);
 %Depart A
-Position2 = Position(1)
+Position2 = Position(1:end-1);
 dH1 = 7*A1(8).*Position2.^6 + 6*A1(7).*Position2.^5 + 5*A1(6).*Position2.^4 + 4*A1(5).*Position2.^3 + 3*A1(4).*Position2.^2 + 2*A1(3).*Position2 + A1(2).*Position2;
 dH2 = 7*A2(8).*Position2.^6 + 6*A2(7).*Position2.^5 + 5*A2(6).*Position2.^4 + 4*A2(5).*Position2.^3 + 3*A2(4).*Position2.^2 + 2*A2(3).*Position2 + A2(2).*Position2;
-ans2 = sqrt(1+(dH2/dH1).^2);
+ans2_1 = sqrt(1+(dH1).^2);
+ans2_2 = sqrt(1+(dH2).^2);
 
 %Les deux ensemble
-Longueur = ans1 + ans2
+Longueur1 = sum(ans1_1 - ans2_1)
+Longueur2 = sum(ans1_2 - ans2_2)
+
+Longueur = Longueur1 + Longueur2
 
 
 H1 = H1(:);
@@ -84,8 +89,8 @@ figure
 hold on
 plot(H2, H1, "red")
 scatter(OUT(:,1), OUT(:,2), "blue", 'filled')
-%xlim([-0.04 0.08])
-%ylim([-0.05 0.05])
+xlim([-0.08 0.08])
+ylim([-0.08 0.08])
 xlabel("Distance (m)")
 ylabel("Distance (m)")
 title("Trajectoire")
