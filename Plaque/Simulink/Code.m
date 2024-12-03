@@ -31,7 +31,7 @@ r_arm = 0.0254; % m
 L_plaque = 0.2750/2; %m
 
 %Savoir c'est quoi l'entree
-Fig_in = 0; % 0=Step      1=Sinus
+Fig_in = 1; % 0=Step      1=Sinus
 Frequence = pi; %rad/s (pi = 0.5hz)
 Test_Angle = pi/4;
 Test_Position = 0.06; % m
@@ -252,13 +252,13 @@ TF_FTBF_ext_Bi = feedback(TF_FTBO_ext_Bi, 1);
 % margin(TF_FTBO_ext_Bi)
 
 % disp("-------------------------Bisectrice----------------------");
-[Gm, Pm, wgm, wpm] = margin(TF_FTBO_ext_Bi);
-Gm = 20*log10(Gm)
-Pm
+% [Gm, Pm, wgm, wpm] = margin(TF_FTBO_ext_Bi);
+% Gm = 20*log10(Gm)
+% Pm
 % DM = (Pm * (180/pi))/wpm
 
 %Validation par step info  (Mp = 18% et t_s = 6)
-stepinfo(TF_FTBF_ext_Bi)
+% stepinfo(TF_FTBF_ext_Bi)
 
 %Validation par Simulink
 %Valider Omega_CD (+- 56°)
