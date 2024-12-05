@@ -22,14 +22,14 @@ OUT = [0.0  3.0  -3.0  -3.0   3.0  3.0  -3.0   0.0;
        0.0  3.0   3.0  -3.0  -3.0  3.0   3.0   0.0]';
 
 
-diviser = 100
+diviser = 100;
 %Mettre en Cm
 OUT = OUT./diviser;
 %0.1375m milieu
 %0.2750m max
 
 Temps = linspace(1, 8, length(OUT(:,1)));
-Position = (1:0.002:8);
+Position = (1:0.15:8);
 
 %Pour les X
 for n = 1:length(OUT(:,1))

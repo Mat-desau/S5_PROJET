@@ -31,7 +31,7 @@ r_arm = 0.0254; % m
 L_plaque = 0.2750/2; %m
 
 %Savoir c'est quoi l'entree
-Fig_in = 1; % 0=Step      1=Sinus
+Fig_in = 0; % 0=Step      1=Sinus
 Frequence = pi; %rad/s (pi = 0.5hz)
 Test_Angle = pi/4;
 Test_Position = 0.06; % m
@@ -127,7 +127,7 @@ Imaginaire = Intersection*tan(angle_Phi);
 Inter = Intersection + Imaginaire*i;
 
 %Calcul de K_int (SI-3)
-K_int = real((((-1)*den_mot(1)*(Inter^2)) + ((-1)*den_mot(2)*(Inter^1))) / (num_mot(1)))
+K_int = real((((-1)*den_mot(1)*(Inter^2)) + ((-1)*den_mot(2)*(Inter^1))) / (num_mot(1)));
 % K_int = 4
 
 %Calcul (SI-2)
@@ -337,7 +337,7 @@ Variables = {"H1", "H2", "OUT"};
 Trajectoire = load(Path, Variables{:});
 
 % Desired step size
-step_size = 0.01;
+step_size = 0.1;
 array_length = length(Trajectoire.H2);
 start_value = 0;
 end_value = (array_length - 1) * step_size;
@@ -608,7 +608,7 @@ Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", string
 % Erreur_Entree_X = (Sim_Non_Lin_Asservi2.Entree_X.Data - Sim_Non_Lin_Asservi2.X);
 % Erreur_Position_Y = (Sim_Non_Lin_Asservi2.Theta_Cd_Y - Sim_Non_Lin_Asservi2.Theta_C_Y);
 % Erreur_Entree_Y = (Sim_Non_Lin_Asservi2.Entree_Y.Data - Sim_Non_Lin_Asservi2.Y);
-% % 
+% %
 % figure
 % plot(Erreur_Position_X)
 % title("Erreur angle X")
