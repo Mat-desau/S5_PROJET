@@ -620,6 +620,7 @@ Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", string
 % title("Erreur Position X")
 % xlabel("Temps (sec)")
 % ylabel("Erreur")
+
 % 
 % figure
 % plot(Erreur_Position_Y)
