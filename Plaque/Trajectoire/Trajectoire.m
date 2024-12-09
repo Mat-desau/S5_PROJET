@@ -22,7 +22,7 @@ OUT = [0.0  3.0  -3.0  -3.0   3.0  3.0  -3.0   0.0;
        0.0  3.0   3.0  -3.0  -3.0  3.0   3.0   0.0]';
 
 
-diviser = 100;
+diviser = 1;
 %Mettre en Cm
 OUT = OUT./diviser;
 %0.1375m milieu

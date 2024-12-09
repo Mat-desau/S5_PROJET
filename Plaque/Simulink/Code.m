@@ -340,12 +340,14 @@ Trajectoire = load(Path, Variables{:});
 step_size = 0.1;
 array_length = length(Trajectoire.H2);
 start_value = 0;
-end_value = (array_length - 1) * step_size;
+end_value = (array_length -1) * step_size;
 result_array = start_value:step_size:end_value;
 
-Hx = timeseries(Trajectoire.H2, result_array);
-Hy = timeseries(Trajectoire.H1, result_array);
+Hx = timeseries((Trajectoire.H2), result_array);
+Hy = timeseries((Trajectoire.H1), result_array);
 OUT = Trajectoire.OUT;
+
+
 
 %Sortir pour banc de test
 Path = which("Code.m");
@@ -620,7 +622,6 @@ Sim_Non_Lin_Asservi2 = sim("Modele_Non_Lineaire_Asservi.slx", "StopTime", string
 % title("Erreur Position X")
 % xlabel("Temps (sec)")
 % ylabel("Erreur")
-
 % 
 % figure
 % plot(Erreur_Position_Y)
